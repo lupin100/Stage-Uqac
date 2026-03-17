@@ -35,15 +35,15 @@ import logo from '../assets/logo_uqac.svg'
           show-arrows
           grow
         >
-          <v-tab>Accueil</v-tab>
-          <v-tab>Laboratoires</v-tab>
-          <v-tab>Membres</v-tab>
-          <v-tab>Thématiques</v-tab>
-          <v-tab>Publications</v-tab>
-          <v-tab>Projets</v-tab>
-          <v-tab>Évènements</v-tab>
-          <v-tab>Nouvelles</v-tab>
-          <v-tab>Nous joindre</v-tab>
+          <v-tab>Accueil</v-tab to="/accueil">
+          <v-tab>Laboratoires</v-tab to="/a-propos">
+          <v-tab>Membres</v-tab to="/membres">
+          <v-tab>Thématiques</v-tab to="/thematiques">
+          <v-tab>Publications</v-tab to="/publications">
+          <v-tab>Projets</v-tab to="/projets">
+          <v-tab>Évènements</v-tab to="/evenements">
+          <v-tab>Nouvelles</v-tab to="/nouvelles">
+          <v-tab>Nous joindre</v-tab to="/nous-joindre">
         </v-tabs>
     </div>
     </template>
