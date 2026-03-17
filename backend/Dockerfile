@@ -20,5 +20,5 @@ WORKDIR /var/www/html
 COPY . .
 
 # On expose le port et on lance le serveur via Symfony CLI
-EXPOSE 8000
-CMD ["symfony", "server:start", "--port=8000", "--no-tls"]
+EXPOSE 8001
+CMD ["symfony", "server:start", "--port=8001", "--no-tls", "--allow-all-ip"]

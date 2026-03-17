@@ -24,7 +24,7 @@ services:
     build:
       context: ./backend
     ports:
-      - "8001:8000" # vous pouvez aussi utiliser "8000:8000"
+      - "8001:8001"
     volumes:
       - ./backend:/var/www/html
     environment:
