@@ -10,14 +10,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    sservices:
+    services:
       database:
         image: postgres:16-alpine
         env:
           POSTGRES_DB: app
           POSTGRES_PASSWORD: "!ChangeMe!"
           POSTGRES_USER: app
-          
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
