@@ -35,7 +35,7 @@ import logo from '../assets/logo_uqac.svg'
           show-arrows
           grow
         >
-          <v-tab>Accueil</v-tab to="/accueil">
+          <v-tab>Accueil</v-tab to="/">
           <v-tab>Laboratoires</v-tab to="/a-propos">
           <v-tab>Membres</v-tab to="/membres">
           <v-tab>Thématiques</v-tab to="/thematiques">
