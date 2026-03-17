@@ -28,7 +28,7 @@ import AppFooter from './components/AppFooter.vue'
 /* Styles globaux pour toute la page */
 body {
   margin: 0;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: Arial, sans-serif;
   background-color: #f9f9f9;
   color: #333;
   min-width: 100%;
