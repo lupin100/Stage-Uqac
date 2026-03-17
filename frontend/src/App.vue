@@ -8,16 +8,17 @@ import AppFooter from './components/AppFooter.vue'
   <div class="layout">
     <AppHeader />
 
+    <header class="navigation">
+      <nav>
+        <ul class="nav-links">
+          <li><RouterLink to="/">Accueil</RouterLink></li>
+          <li><RouterLink to="/a-propos">À propos</RouterLink></li>
+        </ul>
+      </nav>
+    </header>
+
     <main class="content">
-      <h2>Bienvenue sur ma page !</h2>
-      <p>
-        Ceci est une page statique très simple. Le header en haut et le footer en bas 
-        sont gérés par des composants Vue.js indépendants, ce qui rend le code propre 
-        et facile à maintenir.
-      </p>
-      <p>
-        Vous pouvez ajouter autant de texte ou de composants que vous le souhaitez ici.
-      </p>
+      <router-view />
     </main>
 
     <AppFooter />
