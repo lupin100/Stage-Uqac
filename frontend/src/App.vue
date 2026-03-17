@@ -1,37 +1,50 @@
 <script setup>
-import { ref } from 'vue'
-
-const result = ref(null)
-const error = ref(null)
-
-const testConnection = async () => {
-  try {
-    const response = await fetch('http://127.0.0.1:8001/api/ping')
-    if (!response.ok) throw new Error('Erreur réseau')
-    result.value = await response.json()
-    error.value = null
-  } catch (err) {
-    error.value = err.message
-    result.value = null
-  }
-}
+// Importation de nos composants enfants
+import AppHeader from './components/AppHeader.vue'
+import AppFooter from './components/AppFooter.vue'
 </script>
 
 <template>
-  <div style="padding: 20px; text-align: center;">
-    <h2>Test de communication</h2>
-    <button @click="testConnection" style="padding: 10px 20px; cursor: pointer;">
-      Interroger le Backend (Port 8001)
-    </button>
+  <div class="layout">
+    <AppHeader />
 
-    <div v-if="result" style="margin-top: 20px; color: green; border: 1px solid green; padding: 10px;">
-      Succès ! <br>
-      <strong>Message :</strong> {{ result.message }} <br>
-      <strong>Heure du serveur :</strong> {{ result.date }}
-    </div>
+    <main class="content">
+      <h2>Bienvenue sur ma page !</h2>
+      <p>
+        Ceci est une page statique très simple. Le header en haut et le footer en bas 
+        sont gérés par des composants Vue.js indépendants, ce qui rend le code propre 
+        et facile à maintenir.
+      </p>
+      <p>
+        Vous pouvez ajouter autant de texte ou de composants que vous le souhaitez ici.
+      </p>
+    </main>
 
-    <div v-if="error" style="margin-top: 20px; color: red; border: 1px solid red; padding: 10px;">
-      Échec : {{ error }}
-    </div>
+    <AppFooter />
   </div>
 </template>
+
+<style>
+/* Styles globaux pour toute la page */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  min-width: 100%;
+}
+
+/* Le layout en Flexbox permet de garder le footer toujours en bas de l'écran */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  padding: 3rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  flex: 1; /* Remplit l'espace vide entre le header et le footer */
+}
+</style>
