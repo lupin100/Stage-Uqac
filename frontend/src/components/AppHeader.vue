@@ -13,7 +13,7 @@ import logo from '../assets/logo_uqac.svg'
       />
 
       <v-toolbar-title class="header-title text-center">
-        Groupe de recherches en informatique (GRI)
+        Groupe de recherches informatique (GRI)
       </v-toolbar-title>
 
       <v-text-field
@@ -27,27 +27,64 @@ import logo from '../assets/logo_uqac.svg'
     </v-container>
 
     <template #extension>
-      <div class="nav-bar">
-        <v-tabs
-          bg-color="green"
-          align-tabs="end"
-          color="white"
-          show-arrows
-          grow
-        >
-          <v-tab to="/">Accueil</v-tab>
-          <v-tab to="/a-propos">Laboratoires</v-tab>
-          <v-tab to="#blank">Membres</v-tab>
-          <v-tab to="#blank">Thématiques</v-tab>
-          <v-tab to="#blank">Publications</v-tab>
-          <v-tab to="#blank">Projets</v-tab>
-          <v-tab to="#blank">Évènements</v-tab>
-          <v-tab to="#blank">Nouvelles</v-tab>
-          <v-tab to="#blank">Nous joindre</v-tab>
-        </v-tabs>
-    </div>
-    </template>
-  </v-app-bar>
+  <div class="nav-bar">
+    <v-tabs
+      bg-color="green"
+      color="white"
+      grow
+    >
+      <v-tab to="/">Accueil</v-tab>
+
+      <v-tab>
+        Laboratoires
+        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+        <v-menu activator="parent">
+          <v-list>
+            <v-list-item title="A propos" to="/laboratoires/1" />
+            <v-list-item title="Mission" to="/laboratoires/2" />
+            <v-list-item title="Valeur" to="/laboratoires/3" />
+            <v-list-item title="Comités scientifique et exécutif" to="/laboratoires/4" />
+            <v-list-item title="Conseil stratégique" to="/laboratoires/5" />
+          </v-list>
+        </v-menu>
+      </v-tab>
+
+      <v-tab>
+        Membres
+        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+        <v-menu activator="parent">
+          <v-list>
+            <v-list-item title="Membres réguliers" to="/membres/1" />
+            <v-list-item title="Membres associé.e.s" to="/membres/2" />
+            <v-list-item title="Membres émérites" to="/membres/3" />
+            <v-list-item title="Collaborateurs" to="/membres/4" />
+            <v-list-item title="Étudiant.e.s" to="/membres/5" />
+            <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
+          </v-list>
+        </v-menu>
+      </v-tab>
+
+      <v-tab to="/thematiques">Thématiques</v-tab>
+      <v-tab to="/publications">Publications</v-tab>
+      <v-tab to="/projets">Projets</v-tab>
+
+      <v-tab>
+        Évènements
+        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+        <v-menu activator="parent">
+          <v-list>
+            <v-list-item title="Séminaires" to="/evenements/seminaires" />
+            <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
+          </v-list>
+        </v-menu>
+      </v-tab>
+
+      <v-tab to="/nouvelles">Nouvelles</v-tab>
+      <v-tab to="/nous-joindre">Nous joindre</v-tab>
+    </v-tabs>
+  </div>
+</template>
+</v-app-bar>
 </template>
 
 <style scoped>
@@ -73,4 +110,9 @@ import logo from '../assets/logo_uqac.svg'
   width: 100%;
   overflow-x: hidden; /* Empêche physiquement le scroll horizontal */
 } 
+
+:deep(.v-tab) {
+  font-size: 17px;
+  font-weight: 500;
+}
 </style>
