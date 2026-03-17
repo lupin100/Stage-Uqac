@@ -29,7 +29,7 @@ import logo from '../assets/logo_uqac.svg'
     <template #extension>
   <div class="nav-bar">
     <v-tabs
-      bg-color="green"
+      bg-color="#6b8915"
       color="white"
       grow
     >
