@@ -25,7 +25,6 @@ COPY . .
 # Installation des dépendances PHP
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-
 # On expose le port et on lance le serveur via Symfony CLI
 EXPOSE 8001
-CMD ["symfony", "server:start", "--listen-ip=0.0.0.0", "--port=8001", "--no-tls"]
+CMD ["sh", "-c", "php bin/console doctrine:migrations:migrate --no-interaction && symfony server:start --port=8001 --no-tls --allow-all-ip"]
