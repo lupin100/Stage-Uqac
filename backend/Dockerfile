@@ -21,4 +21,4 @@ COPY . .
 
 # On expose le port et on lance le serveur via Symfony CLI
 EXPOSE 8001
-CMD ["symfony", "server:start", "--port=8001", "--no-tls", "--allow-all-ip"]
+CMD ["symfony", "server:start", "--listen-ip=0.0.0.0", "--port=8001", "--no-tls"]
