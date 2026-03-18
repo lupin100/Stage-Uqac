@@ -1,93 +1,138 @@
 <script setup>
 import logo from '../assets/logo_uqac.svg'
+import Breadcrumb from './FilAriane.vue'
 </script>
 
 <template>
-  <v-app-bar color="black" elevation="4" extended extension-height="56">
-    <v-container fluid class="px-8 d-flex align-center">
-      <v-img
-        :src="logo"
-        max-width="120"
-        class="mr-4"
-        contain
-      />
+  <header class="site-header">
+    <!-- Barre noire -->
+    <div class="black-bar">
+      <div class="black-bar-content">
+        <a href="https://www.uqac.ca/" target="_blank" class="d-flex mr-4" style="width: 120px;">
+        <v-img
+          :src="logo"
+          width="120"
+          contain
+        />
+      </a>
 
-      <v-toolbar-title class="header-title text-center">
-        Groupe de recherches informatique (GRI)
-      </v-toolbar-title>
+        <div class="header-title">
+          <router-link to="/" class="text-decoration-none text-white">
+          Groupe de recherches informatique (GRI)
+        </router-link>
+        </div>
 
-      <v-text-field
-        density="compact"
-        variant="solo"
-        placeholder="Rechercher..."
-        hide-details
-        prepend-inner-icon="mdi-magnify"
-        class="search-field ml-4"
-      />
-    </v-container>
+        <v-text-field
+          density="compact"
+          variant="solo"
+          placeholder="Rechercher..."
+          hide-details
+          prepend-inner-icon="mdi-magnify"
+          class="search-field"
+          rounded="pill"
+        />
+      </div>
+    </div>
 
-    <template #extension>
-  <div class="nav-bar">
-    <v-tabs
-      bg-color="#6b8915"
-      color="white"
-      grow
-    >
-      <v-tab to="/">Accueil</v-tab>
+    <!-- Barre grise -->
+    <div class="gray-bar">
+      <div class="gray-bar-content">
+        <Breadcrumb />
+        <div class="lang-switch">
+          <a href="#" class="lang-link">
+            <img src="https://flagcdn.com/w20/fr.png" alt="Français" />
+            <span>Fr</span>
+          </a>
+          <a href="#" class="lang-link">
+            <img src="https://flagcdn.com/w20/gb.png" alt="English" />
+            <span>En</span>
+          </a>
+        </div>
+      </div>
+    </div>
 
-      <v-tab>
-        Laboratoires
-        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item title="A propos" to="a-propos" />
-            <v-list-item title="Mission" to="/laboratoires/2" />
-            <v-list-item title="Valeurs" to="/laboratoires/3" />
-            <v-list-item title="Comités scientifique et exécutif" to="/laboratoires/4" />
-            <v-list-item title="Conseil stratégique" to="/laboratoires/5" />
-          </v-list>
-        </v-menu>
-      </v-tab>
+    <!-- Barre verte -->
+    <div class="green-bar">
+      <v-tabs
+        bg-color="#6b8915"
+        color="white"
+        grow
+      >
+        <v-tab to="/">Accueil</v-tab>
 
-      <v-tab>
-        Membres
-        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item title="Membres réguliers" to="/membres/1" />
-            <v-list-item title="Membres associé.e.s" to="/membres/2" />
-            <v-list-item title="Membres émérites" to="/membres/3" />
-            <v-list-item title="Collaborateurs" to="/membres/4" />
-            <v-list-item title="Étudiant.e.s" to="/membres/5" />
-            <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
-          </v-list>
-        </v-menu>
-      </v-tab>
+        <v-tab>
+          Laboratoires
+          <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item title="A propos" to="/a-propos" />
+              <v-list-item title="Mission" to="/mission" />
+              <v-list-item title="Valeurs" to="/valeurs" />
+              <v-list-item title="Comités scientifique et exécutif" to="/laboratoires/4" />
+              <v-list-item title="Conseil stratégique" to="/laboratoires/5" />
+            </v-list>
+          </v-menu>
+        </v-tab>
 
-      <v-tab to="/thematiques">Thématiques</v-tab>
-      <v-tab to="/publications">Publications</v-tab>
-      <v-tab to="/projets">Projets</v-tab>
+        <v-tab>
+          Membres
+          <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item title="Membres réguliers" to="/membres/1" />
+              <v-list-item title="Membres associé.e.s" to="/membres/2" />
+              <v-list-item title="Membres émérites" to="/membres/3" />
+              <v-list-item title="Collaborateurs" to="/membres/4" />
+              <v-list-item title="Étudiant.e.s" to="/membres/5" />
+              <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
+            </v-list>
+          </v-menu>
+        </v-tab>
 
-      <v-tab>
-        Évènements
-        <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item title="Séminaires" to="/evenements/seminaires" />
-            <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
-          </v-list>
-        </v-menu>
-      </v-tab>
+        <v-tab to="/thematiques">Thématiques</v-tab>
+        <v-tab to="/publications">Publications</v-tab>
+        <v-tab to="/projets">Projets</v-tab>
 
-      <v-tab to="/nouvelles">Nouvelles</v-tab>
-      <v-tab to="/nous-joindre">Nous joindre</v-tab>
-    </v-tabs>
-  </div>
-</template>
-</v-app-bar>
+        <v-tab>
+          Évènements
+          <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item title="Séminaires" to="/evenements/seminaires" />
+              <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
+            </v-list>
+          </v-menu>
+        </v-tab>
+
+        <v-tab to="/nouvelles">Nouvelles</v-tab>
+        <v-tab to="/nous-joindre">Nous joindre</v-tab>
+      </v-tabs>
+    </div>
+  </header>
 </template>
 
 <style scoped>
+.site-header {
+  width: 100%;
+}
+
+.black-bar {
+  background-color: #000;
+  width: 100%;
+}
+
+.black-bar-content {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 32px;
+}
+
+.logo {
+  flex-shrink: 0;
+}
+
 .header-title {
   flex: 1;
   text-align: center;
@@ -97,22 +142,76 @@ import logo from '../assets/logo_uqac.svg'
 }
 
 .search-field {
-  max-width: 220px;
+  max-width: 280px;
+  min-width: 220px;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-.nav-bar {
-  margin: 0;
-  padding: 0;
+.gray-bar {
+  background-color: #4a4a4a;
   width: 100%;
-  overflow-x: hidden; /* Empêche physiquement le scroll horizontal */
-} 
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.gray-bar-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  font-size: 14px;
+  color: white;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lang-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: white;
+  text-decoration: none;
+}
+
+.lang-link img {
+  width: 20px;
+  display: block;
+}
+
+.green-bar {
+  width: 100%;
+}
 
 :deep(.v-tab) {
   font-size: 17px;
   font-weight: 500;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 </style>
