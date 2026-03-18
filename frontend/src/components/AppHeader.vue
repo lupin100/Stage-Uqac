@@ -5,15 +5,18 @@ import logo from '../assets/logo_uqac.svg'
 <template>
   <v-app-bar color="black" elevation="4" extended extension-height="56">
     <v-container fluid class="px-8 d-flex align-center">
-      <v-img
-        :src="logo"
-        max-width="120"
-        class="mr-4"
-        contain
-      />
-
+      <a href="https://www.uqac.ca/" target="_blank" class="d-flex mr-4" style="width: 120px;">
+        <v-img
+          :src="logo"
+          width="120"
+          contain
+        />
+      </a>
+      
       <v-toolbar-title class="header-title text-center">
-        Groupe de recherches informatique (GRI)
+        <router-link to="/" class="text-decoration-none text-white">
+          Groupe de recherches en informatique (GRI)
+        </router-link>
       </v-toolbar-title>
 
       <v-text-field
