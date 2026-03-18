@@ -24,6 +24,11 @@ class Person
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\PreUpdate]
+    public function updateTimestamp(): void {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
