@@ -50,8 +50,8 @@ class Person
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $personalPageUrl = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: PersonEnum::class)]
-    private array $role = [];
+    #[ORM\Column(enumType: PersonEnum::class)]
+    private ?PersonEnum $role = null;
 
     public function getId(): ?int
     {
@@ -178,15 +178,12 @@ class Person
         return $this;
     }
 
-    /**
-     * @return PersonEnum[]
-     */
-    public function getRole(): array
+    public function getRole(): ?PersonEnum
     {
         return $this->role;
     }
 
-    public function setRole(array $role): static
+    public function setRole(PersonEnum $role): static
     {
         $this->role = $role;
 
