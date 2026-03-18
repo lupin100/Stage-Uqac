@@ -1,9 +1,9 @@
 <script setup>
 import logo from '../assets/logo_uqac.svg'
+import Breadcrumb from './FilAriane.vue'
 </script>
 
 <template>
-<<<<<<< HEAD
   <header class="site-header">
     <!-- Barre noire -->
     <div class="black-bar">
@@ -36,16 +36,7 @@ import logo from '../assets/logo_uqac.svg'
     <!-- Barre grise -->
     <div class="gray-bar">
       <div class="gray-bar-content">
-        <div class="breadcrumb">
-          <RouterLink to="/">UQAC</RouterLink>
-          <span>&gt;</span>
-          <RouterLink to="/sciences">Sciences</RouterLink>
-          <span>&gt;</span>
-          <RouterLink to="/informatique">Informatique</RouterLink>
-          <span>&gt;</span>
-          <span>GRI</span>
-        </div>
-
+        <Breadcrumb />
         <div class="lang-switch">
           <a href="#" class="lang-link">
             <img src="https://flagcdn.com/w20/fr.png" alt="Français" />
