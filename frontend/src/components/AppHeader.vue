@@ -3,19 +3,23 @@ import logo from '../assets/logo_uqac.svg'
 </script>
 
 <template>
+<<<<<<< HEAD
   <header class="site-header">
     <!-- Barre noire -->
     <div class="black-bar">
       <div class="black-bar-content">
+        <a href="https://www.uqac.ca/" target="_blank" class="d-flex mr-4" style="width: 120px;">
         <v-img
           :src="logo"
-          max-width="120"
-          class="logo"
+          width="120"
           contain
         />
+      </a>
 
         <div class="header-title">
+          <router-link to="/" class="text-decoration-none text-white">
           Groupe de recherches informatique (GRI)
+        </router-link>
         </div>
 
         <v-text-field
