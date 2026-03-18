@@ -3,7 +3,6 @@ import logo from '../assets/logo_uqac.svg'
 </script>
 
 <template>
-<<<<<<< HEAD
   <header class="site-header">
     <!-- Barre noire -->
     <div class="black-bar">
@@ -29,6 +28,7 @@ import logo from '../assets/logo_uqac.svg'
           hide-details
           prepend-inner-icon="mdi-magnify"
           class="search-field"
+          rounded="pill"
         />
       </div>
     </div>
