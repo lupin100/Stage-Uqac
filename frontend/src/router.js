@@ -3,7 +3,8 @@ import AccueilView from './views/AccueilView.vue'
 import AProposView from './views/AProposView.vue'
 import MissionView from './views/MissionView.vue'
 import ValeursView from './views/ValeursView.vue'
-import ThematiquesView from './views/ThematiquesView.vue'   
+import ThematiquesView from './views/ThematiquesView.vue'
+import NousJoindreView from './views/NousJoindreView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +13,8 @@ const router = createRouter({
     { path: '/a-propos', name: 'about', component: AProposView },
     { path: '/mission', name: 'mission', component: MissionView },
     { path: '/valeurs', name: 'valeurs', component: ValeursView },
-    { path: '/thematiques', name: 'thematiques', component: ThematiquesView }
+    { path: '/thematiques', name: 'thematiques', component: ThematiquesView },
+    { path: '/nous-joindre', name: 'contact', component: NousJoindreView },
   ]
 })
 
