@@ -15,10 +15,6 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer 2.9.5
 COPY --from=composer:2.9.5 /usr/bin/composer /usr/bin/composer
 
-# Installation de Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash \
-    && mv /root/.symfony5/bin/symfony /usr/bin/symfony
-
 WORKDIR /var/www/html
 COPY . .
 
@@ -27,4 +23,5 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # On expose le port et on lance le serveur via Symfony CLI
 EXPOSE 8001
-CMD ["sh", "-c", "php bin/console doctrine:migrations:migrate --no-interaction && symfony server:start --port=8001 --no-tls --allow-all-ip"]
+
+CMD ["php", "-S", "0.0.0.0:8001", "-t", "public"]
