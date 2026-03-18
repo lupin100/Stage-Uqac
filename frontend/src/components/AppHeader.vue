@@ -29,6 +29,7 @@ import Breadcrumb from './FilAriane.vue'
           hide-details
           prepend-inner-icon="mdi-magnify"
           class="search-field"
+          rounded="pill"
         />
       </div>
     </div>
