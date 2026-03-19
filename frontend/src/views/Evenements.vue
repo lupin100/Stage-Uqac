@@ -43,6 +43,16 @@ const formatTime = (dateString) => {
     })
 }
 
+// Fonction pour déterminer vers quelle page de détail envoyer l'utilisateur
+const getEventRouteName = (type) => {
+    if (type === 'Séminaire') {
+        return 'seminaire'
+    }
+    else {
+        return 'congres-et-atelier'
+    }
+}
+
 onMounted(fetchEvents)
 </script>
 
@@ -79,9 +89,9 @@ onMounted(fetchEvents)
                             </v-col>
 
                             <v-col cols="12" md="9" class="pa-6">
-                                
+
                                 <div class="d-flex align-center mb-2 text-caption text-grey">
-                                    <v-chip  color="primary" variant="flat" class="mr-3">
+                                    <v-chip color="primary" variant="flat" class="mr-3">
                                         {{ event.eventType }}
                                     </v-chip>
                                 </div>
@@ -97,12 +107,10 @@ onMounted(fetchEvents)
                                 </v-card-text>
 
                                 <v-card-actions class="px-0 pb-0">
-                                    <v-btn 
-                                        variant="text" 
-                                        color="primary" 
-                                        class="font-weight-bold px-0"
-                                        :to="{ name: 'seminaire', params: { id: event.id } }"
-                                    >
+                                    <v-btn variant="text" color="primary" class="font-weight-bold px-0" :to="{
+                                        name: getEventRouteName(event.eventType),
+                                        params: { id: event.id }
+                                    }">
                                         Voir les détails
                                         <v-icon end>mdi-arrow-right</v-icon>
                                     </v-btn>
@@ -116,21 +124,13 @@ onMounted(fetchEvents)
 
             <v-row v-if="pageCount > 1" justify="center" class="mt-8">
                 <v-col cols="12" md="6">
-                    <v-pagination 
-                        v-model="currentPage" 
-                        :length="pageCount" 
-                        rounded="circle"
-                        color="primary"
-                    ></v-pagination>
+                    <v-pagination v-model="currentPage" :length="pageCount" rounded="circle"
+                        color="primary"></v-pagination>
                 </v-col>
             </v-row>
 
-            <v-empty-state 
-                v-if="allEvents.length === 0" 
-                icon="mdi-calendar-blank" 
-                title="Aucun événement prévu"
-                text="Il n'y a pas d'événements programmés pour le moment."
-            ></v-empty-state>
+            <v-empty-state v-if="allEvents.length === 0" icon="mdi-calendar-blank" title="Aucun événement prévu"
+                text="Il n'y a pas d'événements programmés pour le moment."></v-empty-state>
         </div>
     </v-container>
 </template>
