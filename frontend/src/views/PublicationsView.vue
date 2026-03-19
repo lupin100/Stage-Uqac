@@ -1,33 +1,35 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 
-const allPublications = ref([])
+const allPublications = ref([]) // Stocke les publications de la page actuelle
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
-// --- LOGIQUE DE PAGINATION ---
+// --- CONFIGURATION PAGINATION SERVEUR ---
 const currentPage = ref(1)
-const itemsPerPage = 5 // On peut en afficher plus car les cartes sont plus petites
+const itemsPerPage = 5 
+const totalItems = ref(0) // Reçu du backend via result.total
 
-const paginatedPublications = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage
-    const end = start + itemsPerPage
-    return allPublications.value.slice(start, end)
-})
-
+// Calcul dynamique du nombre de pages pour le composant v-pagination
 const pageCount = computed(() => {
-    return Math.ceil(allPublications.value.length / itemsPerPage)
+    return Math.ceil(totalItems.value / itemsPerPage)
 })
 
 // --- APPEL API ---
 const fetchPublications = async () => {
+    isLoading.value = true
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/publications`)
-        if (!response.ok) throw new Error('Erreur lors du chargement des publications')
-        const data = await response.json()
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/publications?page=${currentPage.value}&limit=${itemsPerPage}`
+        )
         
-        // Tri par année décroissante (les plus récentes en premier)
-        allPublications.value = data.sort((a, b) => b.year - a.year)
+        if (!response.ok) throw new Error('Erreur lors du chargement des publications')
+        
+        const result = await response.json()
+
+        // Mise à jour des références avec les données du backend
+        allPublications.value = result.data 
+        totalItems.value = result.total 
     } catch (error) {
         errorMessage.value = "Impossible de charger les publications."
         console.error(error)
@@ -35,6 +37,12 @@ const fetchPublications = async () => {
         isLoading.value = false
     }
 }
+
+// Relancer l'appel dès que l'utilisateur change de page
+watch(currentPage, () => {
+    fetchPublications()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+})
 
 onMounted(fetchPublications)
 </script>
@@ -53,7 +61,7 @@ onMounted(fetchPublications)
 
         <div v-else>
             <v-row>
-                <v-col v-for="pub in paginatedPublications" :key="pub.id" cols="12">
+                <v-col v-for="pub in allPublications" :key="pub.id" cols="12">
                     <v-card variant="outlined" class="mb-2 border-sm hover-shadow transition-swing">
                         <v-row no-gutters align="center">
                             
@@ -64,8 +72,8 @@ onMounted(fetchPublications)
                             </v-col>
 
                             <v-col cols="12" md="8" class="pa-4">
-                                <div class="mb-4">
-                                    <v-chip variant="tonal" color="primary" class="font-weight-bold">
+                                <div class="mb-2">
+                                    <v-chip variant="tonal" color="primary" size="x-small" class="font-weight-bold">
                                         {{ pub.publicationType }}
                                     </v-chip>
                                 </div>
@@ -127,7 +135,7 @@ onMounted(fetchPublications)
 
 .hover-shadow:hover {
     background-color: #f9f9f9;
-    border-color: #6B8915 !important;
+    border-color: #6B8915 !important; /* Ton vert GRI */
 }
 
 .transition-swing {

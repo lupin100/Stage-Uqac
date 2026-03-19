@@ -1,47 +1,50 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 
 const allEvents = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
-// --- LOGIQUE DE PAGINATION ---
+// --- CONFIGURATION PAGINATION SERVEUR ---
 const currentPage = ref(1)
 const itemsPerPage = 3
+const totalItems = ref(0) // Reçu du backend
 
-// Puisque le backend a déjà trié, on utilise directement allEvents
-const paginatedEvents = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage
-    const end = start + itemsPerPage
-    return allEvents.value.slice(start, end)
-})
-
+// Calcul dynamique du nombre de pages pour Vuetify
 const pageCount = computed(() => {
-    return Math.ceil(allEvents.value.length / itemsPerPage)
+  return Math.ceil(totalItems.value / itemsPerPage)
 })
 
 // --- APPEL API ---
 const fetchEvents = async () => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events`)
-        if (!response.ok) throw new Error('Erreur lors du chargement des événements')
-        const data = await response.json()
-        allEvents.value = data
-    } catch (error) {
-        errorMessage.value = "Impossible de charger les événements."
-        console.error(error)
-    } finally {
-        isLoading.value = false
-    }
+  isLoading.value = true
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/events?page=${currentPage.value}&limit=${itemsPerPage}`
+    )
+    
+    if (!response.ok) throw new Error('Erreur API')
+    
+    const result = await response.json()
+
+    // On extrait les données selon la structure de ton backend
+    allEvents.value = result.data // Les 3 événements de la page
+    totalItems.value = result.total // Le chiffre global (ex: 42)
+
+  } catch (error) {
+    errorMessage.value = "Impossible de charger les événements."
+    console.error(error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
-// --- FORMATTAGE DES DATES ET HEURES ---
-const formatTime = (dateString) => {
-    if (!dateString) return ''
-    return new Date(dateString).toLocaleTimeString('fr-CA', {
-        hour: '2-digit', minute: '2-digit'
-    })
-}
+// Relancer l'appel dès que l'utilisateur change de page
+watch(currentPage, () => {
+  fetchEvents()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+})
+
 
 // Fonction pour déterminer vers quelle page de détail envoyer l'utilisateur
 const getEventRouteName = (type) => {
@@ -70,7 +73,7 @@ onMounted(fetchEvents)
 
         <div v-else>
             <v-row>
-                <v-col v-for="event in paginatedEvents" :key="event.id" cols="12">
+                <v-col v-for="event in allEvents" :key="event.id" cols="12">
                     <v-card variant="outlined" class="mb-4 border-sm overflow-hidden">
                         <v-row no-gutters>
 
