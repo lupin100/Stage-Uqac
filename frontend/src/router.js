@@ -7,6 +7,8 @@ import ThematiquesView from './views/ThematiquesView.vue'
 import NousJoindreView from './views/NousJoindreView.vue'
 import NouvellesView from './views/NouvellesView.vue'
 import NouvelleView from './views/NouvelleView.vue'
+import SeminairesView from './views/SeminairesView.vue'
+import SeminaireView from './views/SeminaireView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -41,7 +43,15 @@ const router = createRouter({
       breadcrumb: [
           { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id', to: '' } ] 
         }
-    }
+    },
+    { path: '/seminaires', name: 'seminaires', component: SeminairesView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Séminaires', to: '/seminaires' } ] 
+        }
+    },
+    { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id', to: '' } ] // utiliser le même composant que pour les nouvelles, mais avec une route différente pour différencier les types d'événements
+    } }
 
   ]
 })

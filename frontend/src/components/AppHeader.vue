@@ -121,8 +121,8 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
-              <v-list-item title="Séminaires" to="/evenements/seminaires" />
-              <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
+              <v-list-item title="Séminaires" to="/seminaires" />
+              <v-list-item title="Congrès et ateliers" to="/congresetateliers" />
             </v-list>
           </v-menu>
         </v-tab>
