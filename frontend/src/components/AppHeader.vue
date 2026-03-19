@@ -122,7 +122,7 @@ const breadcrumbs = computed(() => {
           <v-menu activator="parent">
             <v-list>
               <v-list-item title="Séminaires" to="/seminaires" />
-              <v-list-item title="Congrès et ateliers" to="/congresetateliers" />
+              <v-list-item title="Congrès et ateliers" to="/congres-et-ateliers" />
             </v-list>
           </v-menu>
         </v-tab>
