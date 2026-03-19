@@ -36,7 +36,7 @@ class AppFixtures extends Fixture
             $title = $faker->randomElement($eventPrefixes) . ' ' . $faker->randomElement($itSubjects);
 
             $event->setTitle($title)
-                  ->setContent($faker->realText(800))
+                  ->setContent($faker->realText(4000))
                   ->setStartDate($startDate)
                   ->setEndDate($endDate)
                   ->setEventType($faker->randomElement($eventEnums));
@@ -52,9 +52,9 @@ class AppFixtures extends Fixture
             $title = $faker->randomElement($newsPrefixes) . ' ' . $faker->randomElement($itSubjects);
             
             $news->setTitle($title)
-                 ->setContent($faker->realText(800))
+                 ->setContent($faker->realText(4000))
                  ->setPublishedAt(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-2 year', 'now')))
-                 ->setImagePath($faker->imageUrl(800, 600, 'technics', true));
+                 ->setImagePath('https://loremflickr.com/800/600/computer,technology?lock=' . $i);
             
             $manager->persist($news);
         }

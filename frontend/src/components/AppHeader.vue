@@ -1,6 +1,28 @@
 <script setup>
 import logo from '../assets/logo_uqac.svg'
 import Breadcrumb from './FilAriane.vue'
+
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { breadcrumbStore } from '../main.js'
+
+const route = useRoute()
+
+const breadcrumbs = computed(() => {
+  const metaBreadcrumbs = route.meta.breadcrumb || []
+  
+  return metaBreadcrumbs.map(item => {
+    // Si le titre est celui de la nouvelle dynamique
+    if (item.title === 'Nouvelle/:id') {
+      return {
+        ...item,
+        title: breadcrumbStore.dynamicTitle, // On utilise le titre du store
+        to: route.path // On s'assure que le lien est le bon
+      }
+    }
+    return item
+  })
+})
 </script>
 
 <template>
@@ -43,6 +65,7 @@ import Breadcrumb from './FilAriane.vue'
             <img src="https://flagcdn.com/w20/fr.png" alt="Français" />
             <span>Fr</span>
           </a>
+          <span>|</span>
           <a href="#" class="lang-link">
             <img src="https://flagcdn.com/w20/gb.png" alt="English" />
             <span>En</span>
@@ -98,8 +121,8 @@ import Breadcrumb from './FilAriane.vue'
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
-              <v-list-item title="Séminaires" to="/evenements/seminaires" />
-              <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
+              <v-list-item title="Séminaires" to="/seminaires" />
+              <v-list-item title="Congrès et ateliers" to="/congres-et-ateliers" />
             </v-list>
           </v-menu>
         </v-tab>
