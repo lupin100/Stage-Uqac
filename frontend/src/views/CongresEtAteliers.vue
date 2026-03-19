@@ -9,20 +9,20 @@ const errorMessage = ref(null)
 const currentPage = ref(1)
 const itemsPerPage = 3
 
-// Filtrer pour ne garder que les Séminaires
-const onlySeminaires = computed(() => {
-    return allEvents.value.filter(event => event.eventType === 'Séminaire')
+// Filtrer pour ne garder que les Congrès et Ateliers
+const onlyCongresEtAteliers = computed(() => {
+    return allEvents.value.filter(event => event.eventType === 'Congrès' || event.eventType === 'Atelier')
 })
 
 // Découper pour la pagination
-const paginatedSeminaires = computed(() => {
+const paginatedCongresEtAteliers = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage
     const end = start + itemsPerPage
-    return onlySeminaires.value.slice(start, end)
+    return onlyCongresEtAteliers.value.slice(start, end)
 })
 
 const pageCount = computed(() => {
-    return Math.ceil(onlySeminaires.value.length / itemsPerPage)
+    return Math.ceil(onlyCongresEtAteliers.value.length / itemsPerPage)
 })
 
 // --- APPEL API ---
@@ -59,7 +59,7 @@ onMounted(fetchEvents)
 
 <template>
     <v-container class="py-10" max-width="1000">
-        <h2 class="text-h2 font-weight-bold mb-10">Séminaires</h2>
+        <h2 class="text-h2 font-weight-bold mb-10">Congrès et Ateliers</h2>
 
         <div v-if="isLoading" class="text-center py-10">
             <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
@@ -71,10 +71,9 @@ onMounted(fetchEvents)
 
         <div v-else>
             <v-row>
-                <v-col v-for="event in paginatedSeminaires" :key="event.id" cols="12">
+                <v-col v-for="event in paginatedCongresEtAteliers" :key="event.id" cols="12">
                     <v-card variant="outlined" class="mb-4 border-sm overflow-hidden">
                         <v-row no-gutters>
-
                             <v-col cols="12" md="3"
                                 class="bg-grey-lighten-4 d-flex flex-column align-center justify-center pa-4 text-center">
                                 <v-icon color="primary" size="32" class="mb-2">mdi-calendar-range</v-icon>
@@ -84,12 +83,10 @@ onMounted(fetchEvents)
                                 <div class="text-uppercase font-weight-medium">
                                     {{ new Date(event.startDate).toLocaleDateString('fr-CA', { month: 'short' }) }}
                                 </div>
-                                <div class="text-caption text-grey-darken-1">{{ new Date(event.startDate).getFullYear()
-                                    }}</div>
+                                <div class="text-caption text-grey-darken-1">{{ new Date(event.startDate).getFullYear() }}</div>
                             </v-col>
 
                             <v-col cols="12" md="9" class="pa-6">
-
                                 <v-card-title class="text-h5 font-weight-bold px-0 pt-0 text-wrap">
                                     {{ event.title }}
                                 </v-card-title>
@@ -102,13 +99,12 @@ onMounted(fetchEvents)
 
                                 <v-card-actions class="px-0 pb-0">
                                     <v-btn variant="text" color="primary" class="font-weight-bold px-0"
-                                        :to="{ name: 'seminaire', params: { id: event.id } }">
+                                        :to="{ name: 'congres-et-atelier', params: { id: event.id } }">
                                         Voir les détails
                                         <v-icon end>mdi-arrow-right</v-icon>
                                     </v-btn>
                                 </v-card-actions>
                             </v-col>
-
                         </v-row>
                     </v-card>
                 </v-col>
@@ -121,8 +117,12 @@ onMounted(fetchEvents)
                 </v-col>
             </v-row>
 
-            <v-empty-state v-if="onlySeminaires.length === 0" icon="mdi-calendar-blank" title="Aucun séminaire prévu"
-                text="Il n'y a pas de séminaires programmés pour le moment."></v-empty-state>
+            <v-empty-state 
+                v-if="onlyCongresEtAteliers.length === 0" 
+                icon="mdi-calendar-blank" 
+                title="Aucun événement prévu"
+                text="Il n'y a pas de congrès ou d'ateliers programmés pour le moment."
+            ></v-empty-state>
         </div>
     </v-container>
 </template>

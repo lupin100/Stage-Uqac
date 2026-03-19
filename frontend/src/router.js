@@ -9,6 +9,8 @@ import NouvellesView from './views/NouvellesView.vue'
 import NouvelleView from './views/NouvelleView.vue'
 import SeminairesView from './views/SeminairesView.vue'
 import SeminaireView from './views/SeminaireView.vue'
+import CongresEtAteliersView from './views/CongresEtAteliers.vue'
+import CongresEtAtelierView from './views/CongresEtAtelier.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -41,7 +43,7 @@ const router = createRouter({
     },
     { path: '/nouvelles/:id', name: 'nouvelle', component: NouvelleView, meta: {
       breadcrumb: [
-          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id', to: '' } ] 
+          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id' } ] 
         }
     },
     { path: '/seminaires', name: 'seminaires', component: SeminairesView, meta: {
@@ -50,7 +52,15 @@ const router = createRouter({
         }
     },
     { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id', to: '' } ] // utiliser le même composant que pour les nouvelles, mais avec une route différente pour différencier les types d'événements
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ] // utiliser le même composant que pour les nouvelles
+    } },
+    { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] 
+        }
+    },
+    { path: '/congres-et-ateliers/:id', name: 'congres-et-atelier', component: CongresEtAtelierView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
     } }
 
   ]
