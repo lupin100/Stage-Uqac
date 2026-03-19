@@ -2,10 +2,23 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { breadcrumbStore } from '../main.js' // On importe le store ici aussi pour l'affichage des titres
+
 const route = useRoute()
 
 const breadcrumbs = computed(() => {
-  return route.meta?.breadcrumb || []
+  const metaBreadcrumbs = route.meta?.breadcrumb || []
+  
+  return metaBreadcrumbs.map(item => {
+    // Si on détecte notre mot-clé magique, on remplace le titre
+    if (item.title === 'Nouvelle/:id') {
+      return {
+        ...item,
+        title: breadcrumbStore.dynamicTitle
+      }
+    }
+    return item
+  })
 })
 </script>
 
@@ -21,17 +34,11 @@ const breadcrumbs = computed(() => {
         {{ item.title }}
       </RouterLink>
 
-      <span
-        v-else
-        class="breadcrumb-current"
-      >
+      <span v-else class="breadcrumb-current">
         {{ item.title }}
       </span>
 
-      <span
-        v-if="index !== breadcrumbs.length - 1"
-        class="breadcrumb-separator"
-      >
+      <span v-if="index !== breadcrumbs.length - 1" class="breadcrumb-separator">
         &gt;
       </span>
     </template>
