@@ -10,7 +10,7 @@ const errorMessage = ref(null)
 const fetchPingFromBackend = async () => {
   try {
     // On appelle l'URL de ton conteneur backend (port 8001)
-    const response = await fetch('http://localhost:8001/api/ping', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ping`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
