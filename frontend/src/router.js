@@ -50,17 +50,17 @@ const router = createRouter({
     },
     { path: '/seminaires', name: 'seminaires', component: SeminairesView, meta: {
       breadcrumb: [
-          { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Séminaires', to: '/seminaires' } ] 
+          { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Séminaires', to: '/seminaires' } ] 
         }
     },
     { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ] // utiliser le même composant que pour les nouvelles
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ] // utiliser la même fonction que pour les nouvelles
     } },
     { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
     },
     { path: '/congres-et-ateliers/:id', name: 'congres-et-atelier', component: CongresEtAtelierView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
     } },
     { path: '/publications', name: 'publications', component: PublicationsView, meta: {
       breadcrumb: [
