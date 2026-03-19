@@ -12,6 +12,7 @@ import SeminaireView from './views/SeminaireView.vue'
 import CongresEtAteliersView from './views/CongresEtAteliers.vue'
 import CongresEtAtelierView from './views/CongresEtAtelier.vue'
 import PublicationsView from './views/PublicationsView.vue'
+import EvenementsView from './views/Evenements.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -64,7 +65,10 @@ const router = createRouter({
     { path: '/publications', name: 'publications', component: PublicationsView, meta: {
       breadcrumb: [
           { title: 'Accueil', to: '/' }, { title: 'Publications', to: '/publications' } ] } 
-    }
+    },
+    { path: '/evenements', name: 'evenements', component: EvenementsView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Événements', to: '/evenements' } ] }
+    },
 
   ]
 })
