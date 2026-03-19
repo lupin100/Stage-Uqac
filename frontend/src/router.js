@@ -11,6 +11,7 @@ import SeminairesView from './views/SeminairesView.vue'
 import SeminaireView from './views/SeminaireView.vue'
 import CongresEtAteliersView from './views/CongresEtAteliers.vue'
 import CongresEtAtelierView from './views/CongresEtAtelier.vue'
+import PublicationsView from './views/PublicationsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -55,13 +56,15 @@ const router = createRouter({
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ] // utiliser le même composant que pour les nouvelles
     } },
     { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
-      breadcrumb: [
-          { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] 
-        }
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Evénements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
     },
     { path: '/congres-et-ateliers/:id', name: 'congres-et-atelier', component: CongresEtAtelierView, meta: {
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
-    } }
+    } },
+    { path: '/publications', name: 'publications', component: PublicationsView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Publications', to: '/publications' } ] } 
+    }
 
   ]
 })
