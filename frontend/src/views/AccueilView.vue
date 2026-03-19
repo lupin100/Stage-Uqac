@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed  } from 'vue'
 
 // Ces variables (refs) vont stocker la réponse du backend
 const apiData = ref(null)
@@ -86,12 +86,45 @@ const fetchEvents = async () => {
   }
 }
 
+const latestNews = computed(() =>
+  [...newsData.value]
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+    .slice(0, 4)
+)
+
+const latestEvents = computed(() =>
+  [...eventsData.value]
+    .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+    .slice(0, 5)
+)
+
+const formatEventDay = (date) => {
+  const d = new Date(date)
+  return d.getDate()
+}
+
+const formatEventMonth = (date) => {
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-CA', { month: 'short' }).replace('.', '').toUpperCase()
+}
+
+const formatEventYear = (date) => {
+  const d = new Date(date)
+  return d.getFullYear()
+}
+
+const formatEventWeekday = (date) => {
+  const d = new Date(date)
+  return d.toLocaleDateString('fr-CA', { weekday: 'short' })
+}
+
 // On lance l'appel dès que le composant est monté (affiché à l'écran)
 onMounted(() => {
   fetchPingFromBackend()
   fetchNews()
   fetchEvents()
 })
+
 </script>
 
 <template>
@@ -159,94 +192,100 @@ onMounted(() => {
           de prendre son essor
          </p>
 
-         <v-row class="mt-8" justify="space-between">
-            <!-- Nouvelles -->
-            <v-col cols="12" md="6">
-              <h3 class="text-h6 font-weight-bold mb-4">Nouvelles</h3>
+         <v-row class="mt-10" justify="space-between">
+          <!-- NOUVELLES -->
+          <v-col cols="12" md="6">
+            <div class="section-header">Nouvelles</div>
 
-              <v-progress-circular
-                v-if="isLoadingNews"
-                indeterminate
-                color="primary"
-              />
+            <v-progress-circular
+              v-if="isLoadingNews"
+              indeterminate
+              color="primary"
+              class="mt-4"
+            />
 
-              <v-alert
-                v-else-if="newsError"
-                type="error"
-                variant="tonal"
+            <v-alert
+              v-else-if="newsError"
+              type="error"
+              variant="tonal"
+              class="mt-4"
+            >
+              {{ newsError }}
+            </v-alert>
+
+            <div v-else class="news-list">
+              <div
+                v-for="news in latestNews"
+                :key="news.id"
+                class="news-item"
               >
-                {{ newsError }}
-              </v-alert>
+                <div class="news-image-wrapper">
+                  <v-img
+                    :src="news.imagePath"
+                    class="news-image"
+                    cover
+                  />
+                </div>
 
-              <div v-else>
-                <v-card
-                  v-for="news in newsData"
-                  :key="news.id"
-                  class="mb-4 pa-3"
-                  variant="outlined"
-                >
-                  <v-row no-gutters>
-                    <v-col cols="4">
-                      <v-img
-                        :src="news.imagePath"
-                        height="120"
-                        cover
-                      />
-                    </v-col>
+                <div class="news-content">
+                  <p class="news-date">
+                    {{ new Date(news.publishedAt).toLocaleDateString('fr-CA', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    }) }}
+                  </p>
 
-                    <v-col cols="8" class="pl-4 text-left">
-                      <p class="text-caption mb-2">
-                        {{ new Date(news.publishedAt).toLocaleDateString() }}
-                      </p>
-                      <p class="text-body-1 font-weight-bold">
-                        {{ news.title }}
-                      </p>
-                    </v-col>
-                  </v-row>
-                </v-card>
+                  <p class="news-title">
+                    {{ news.title }}
+                  </p>
+                </div>
               </div>
-            </v-col>
+            </div>
+          </v-col>
 
-            <!-- Évènements -->
-            <v-col cols="12" md="6">
-              <h3 class="text-h6 font-weight-bold mb-4">Évènements</h3>
+          <!-- ÉVÈNEMENTS -->
+          <v-col cols="12" md="6">
+            <div class="section-header">Évènements</div>
 
-              <v-progress-circular
-                v-if="isLoadingEvents"
-                indeterminate
-                color="primary"
-              />
+            <v-progress-circular
+              v-if="isLoadingEvents"
+              indeterminate
+              color="primary"
+              class="mt-4"
+            />
 
-              <v-alert
-                v-else-if="eventsError"
-                type="error"
-                variant="tonal"
+            <v-alert
+              v-else-if="eventsError"
+              type="error"
+              variant="tonal"
+              class="mt-4"
+            >
+              {{ eventsError }}
+            </v-alert>
+
+            <div v-else class="events-list">
+              <div
+                v-for="event in latestEvents"
+                :key="event.id"
+                class="event-item"
               >
-                {{ eventsError }}
-              </v-alert>
+                <div class="event-date-box">
+                  <div class="event-weekday">{{ formatEventWeekday(event.startDate) }}</div>
+                  <div class="event-day">{{ formatEventDay(event.startDate) }}</div>
+                  <div class="event-month">{{ formatEventMonth(event.startDate) }}</div>
+                  <div class="event-year">{{ formatEventYear(event.startDate) }}</div>
+                </div>
 
-              <div v-else>
-                <v-card
-                  v-for="event in eventsData"
-                  :key="event.id"
-                  class="mb-4 pa-3"
-                  variant="outlined"
-                >
-                  <div class="text-left">
-                    <p class="text-caption mb-1">
-                      {{ new Date(event.date).toLocaleDateString() }}
-                    </p>
-                    <p class="text-body-1 font-weight-bold mb-1">
-                      {{ event.title }}
-                    </p>
-                    <p class="text-body-2">
-                      {{ event.category }}
-                    </p>
-                  </div>
-                </v-card>
+                <div class="event-content">
+                  <p class="event-type">{{ event.eventType }}</p>
+                  <p class="event-title">{{ event.title }}</p>
+                </div>
               </div>
-            </v-col>
-          </v-row>
+            </div>
+          </v-col>
+        </v-row>
 
 
         <v-card class="mb-8 pa-4" variant="outlined" color="primary">
@@ -271,3 +310,139 @@ onMounted(() => {
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.section-header {
+  display: inline-block;
+  background-color: #6b8e00;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 14px 28px;
+  margin-bottom: 0;
+}
+
+.news-list,
+.events-list {
+  border-top: 2px solid #bdbdbd;
+}
+
+.news-item,
+.event-item {
+  display: flex;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 2px solid #c7c7c7;
+}
+
+.news-image-wrapper {
+  width: 190px;
+  min-width: 190px;
+}
+
+.news-image {
+  width: 190px;
+  height: 140px;
+  border: 1px solid #cfcfcf;
+}
+
+.news-content,
+.event-content {
+  flex: 1;
+  text-align: left;
+}
+
+.news-date {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
+.news-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #222;
+  margin: 0;
+}
+
+.event-date-box {
+  width: 100px;
+  min-width: 100px;
+  background-color: #3b3b3b;
+  color: white;
+  text-align: center;
+  padding: 8px 6px;
+  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.event-weekday {
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.event-day {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.event-month {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.event-year {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.event-type {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.event-title {
+  font-size: 1.05rem;
+  color: #2b8ccf;
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .news-item,
+  .event-item {
+    align-items: flex-start;
+  }
+
+  .news-image-wrapper {
+    width: 130px;
+    min-width: 130px;
+  }
+
+  .news-image {
+    width: 130px;
+    height: 100px;
+  }
+
+  .event-date-box {
+    width: 85px;
+    min-width: 85px;
+  }
+
+  .event-day {
+    font-size: 1.6rem;
+  }
+
+  .event-month,
+  .event-year {
+    font-size: 1.15rem;
+  }
+}
+</style>
