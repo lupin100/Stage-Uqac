@@ -17,10 +17,36 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class EventController extends AbstractController
 {
     #[Route('', name: 'app_event_index', methods: ['GET'])]
-    public function index(EventRepository $repository): JsonResponse
+    public function index(Request $request, EventRepository $repository): JsonResponse
     {
-        // On récupère les événements triés par date de début
-        return $this->json($repository->findBy([], ['startDate' => 'DESC']), Response::HTTP_OK);
+        $page = $request->query->get('page');
+
+        // pas de page précisé -> envoie toutes les données
+        if ($page === null) {
+            $events = $repository->findBy([], ['startDate' => 'DESC']);
+            return $this->json($events, Response::HTTP_OK);
+        }
+
+        // avec page spec -> pagination
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 10));
+        $offset = ($page - 1) * $limit;
+
+        $events = $repository->findBy(
+            [],
+            ['startDate' => 'DESC'],
+            $limit,
+            $offset
+        );
+
+        $total = $repository->count([]);
+
+        return $this->json([
+            'data' => $events,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total
+        ]);
     }
 
     #[Route('', name: 'app_event_create', methods: ['POST'])]

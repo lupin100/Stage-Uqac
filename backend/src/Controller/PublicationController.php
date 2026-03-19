@@ -18,11 +18,39 @@ class PublicationController extends AbstractController
 {
     /**
      * GET ALL : Liste toutes les publications, classées par année (plus récent d'abord)
+     * Supporte la pagination via les paramètres "page" et "limit"
      */
     #[Route('', name: 'app_publication_index', methods: ['GET'])]
-    public function index(PublicationRepository $repository): JsonResponse
+    public function index(Request $request, PublicationRepository $repository): JsonResponse
     {
-        return $this->json($repository->findBy([], ['year' => 'DESC']), Response::HTTP_OK);
+        $page = $request->query->get('page');
+
+        // pas de page précisé -> envoie toutes les données
+        if ($page === null) {
+            $publications = $repository->findBy([], ['year' => 'DESC']);
+            return $this->json($publications, Response::HTTP_OK);
+        }
+
+        // avec page spec -> pagination
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 10));
+        $offset = ($page - 1) * $limit;
+
+        $publications = $repository->findBy(
+            [],
+            ['year' => 'DESC'],
+            $limit,
+            $offset
+        );
+
+        $total = $repository->count([]);
+
+        return $this->json([
+            'data' => $publications,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total
+        ]);
     }
 
     /**
