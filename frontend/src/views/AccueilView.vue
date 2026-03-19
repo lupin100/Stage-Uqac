@@ -16,6 +16,11 @@ const eventsData = ref([])
 const isLoadingEvents = ref(true)
 const eventsError = ref(null)
 
+// Publications
+const publicationsData = ref([])
+const isLoadingPublications = ref(true)
+const publicationsError = ref(null)
+
 // Fonction pour appeler le backend Symfony
 const fetchPingFromBackend = async () => {
   try {
@@ -86,6 +91,28 @@ const fetchEvents = async () => {
   }
 }
 
+const fetchPublications = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/publications`, {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`)
+    }
+
+    const data = await response.json()
+    publicationsData.value = data
+  } catch (error) {
+    console.error('Erreur chargement publications :', error)
+    publicationsError.value = 'Impossible de charger les publications.'
+  } finally {
+    isLoadingPublications.value = false
+  }
+}
+
 const latestNews = computed(() =>
   [...newsData.value]
     .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
@@ -96,6 +123,12 @@ const latestEvents = computed(() =>
   [...eventsData.value]
     .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
     .slice(0, 5)
+)
+
+const latestPublications = computed(() =>
+  [...publicationsData.value]
+    .sort((a, b) => b.year - a.year)
+    .slice(0, 3)
 )
 
 const formatEventDay = (date) => {
@@ -123,6 +156,7 @@ onMounted(() => {
   fetchPingFromBackend()
   fetchNews()
   fetchEvents()
+  fetchPublications()
 })
 
 </script>
@@ -141,9 +175,9 @@ onMounted(() => {
           height="420"
           hide-delimiter-background
           show-arrows="hover"
-         
         >
-        
+        <!-- cycle de  v-caroussel, auto focus qd ça change d'image - régler ça-->
+
           <v-carousel-item transition="false"  reverse-transition="false">
             <v-img
               src="https://loremflickr.com/800/600/computer,technology?lock=12"
@@ -242,6 +276,11 @@ onMounted(() => {
                   </p>
                 </div>
               </div>
+              <div class="publications-header">
+                <router-link to="/nouvelles" class="all-link">
+                  Toutes les nouvelles +
+                </router-link>
+              </div>
             </div>
           </v-col>
 
@@ -283,31 +322,60 @@ onMounted(() => {
                   <p class="event-title">{{ event.title }}</p>
                 </div>
               </div>
+              <div class="publications-header">
+                <router-link to="/evenements" class="all-link">
+                  Tous les évènements +
+                </router-link>
+              </div>
             </div>
           </v-col>
         </v-row>
 
+        <v-row class="mt-10">
+          <v-col cols="12">
+            <div class="section-header">Publications</div>
 
-        <v-card class="mb-8 pa-4" variant="outlined" color="primary">
-          <v-card-title>Test de connexion Backend</v-card-title>
-          
-          <v-card-text>
-            <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
-            
-            <v-alert v-else-if="errorMessage" type="error" variant="tonal">
-              {{ errorMessage }}
+            <v-progress-circular
+              v-if="isLoadingPublications"
+              indeterminate
+              color="primary"
+              class="mt-4"
+            />
+
+            <v-alert
+              v-else-if="publicationsError"
+              type="error"
+              variant="tonal"
+              class="mt-4"
+            >
+              {{ publicationsError }}
             </v-alert>
-            
-            <div v-else-if="apiData">
-              <p class="text-success font-weight-bold mb-2">Connecté avec succès !</p>
-              <p><strong>Message :</strong> {{ apiData.message }}</p>
-              <p><strong>Date serveur :</strong> {{ apiData.date }}</p>
-            </div>
-          </v-card-text>
-        </v-card>
 
+            <div v-else class="publications-list">
+              <div class="publications-grid">
+                <div
+                  v-for="publication in latestPublications"
+                  :key="publication.id"
+                  class="publication-item"
+                >
+                  <p class="publication-title">
+                    {{ publication.title }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="publications-header">
+                <router-link to="/publications" class="all-link">
+                  Toutes les publications +
+                </router-link>
+              </div>
+            </div>
+
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
+
   </v-container>
 </template>
 
@@ -444,5 +512,51 @@ onMounted(() => {
   .event-year {
     font-size: 1.15rem;
   }
+}
+
+.publications-list {
+  border-top: 2px solid #bdbdbd;
+  padding-top: 14px;
+}
+
+.publications-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.publication-item {
+  text-align: left;
+}
+
+.publication-title {
+  font-size: 1rem;
+  line-height: 1.35;
+  color: #333;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .publications-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.publications-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-bottom: 2px solid #bdbdbd;
+}
+
+.all-link {
+  color: #2b8ccf;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.all-link:hover {
+  text-decoration: underline;
 }
 </style>

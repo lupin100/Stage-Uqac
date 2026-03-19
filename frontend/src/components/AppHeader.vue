@@ -65,6 +65,7 @@ const breadcrumbs = computed(() => {
             <img src="https://flagcdn.com/w20/fr.png" alt="Français" />
             <span>Fr</span>
           </a>
+          <span>|</span>
           <a href="#" class="lang-link">
             <img src="https://flagcdn.com/w20/gb.png" alt="English" />
             <span>En</span>
