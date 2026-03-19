@@ -61,12 +61,12 @@ onMounted(fetchNewsDetail)
         class="rounded-lg mb-8 bg-grey-lighten-2"
       ></v-img>
 
-      <div class="mb-4">
-        <span class="text-overline text-grey">Publié le {{ formatDate(news.publishedAt) }}</span>
-      </div>
+      <h1 class="text-h2 font-weight-bold mb-0">{{ news.title }}</h1>
 
-      <h1 class="text-h2 font-weight-bold mb-6">{{ news.title }}</h1>
-
+        <div class="mb-6">
+            <span class="text-overline text-grey">Publié le {{ formatDate(news.publishedAt) }}</span>
+        </div>
+      
       <v-divider class="mb-8"></v-divider>
 
       <div class="text-body-1 text-justify" style="line-height: 1.8; white-space: pre-line;">
