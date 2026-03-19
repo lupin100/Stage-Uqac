@@ -21,7 +21,7 @@ class Event
     #[ORM\Column]
     private ?\DateTimeImmutable $endDate = null;
 
-    #[ORM\Column(length: 2500)]
+    #[ORM\Column(length: 5000)]
     private ?string $content = null;
 
     #[ORM\Column(length: 255)]
