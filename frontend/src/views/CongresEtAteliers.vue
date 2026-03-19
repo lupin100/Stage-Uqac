@@ -5,22 +5,25 @@ const allEvents = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
-// --- LOGIQUE DE PAGINATION ---
+// --- LOGIQUE DE PAGINATION (CLIENT-SIDE) ---
 const currentPage = ref(1)
 const itemsPerPage = 3
 
-// Filtrer pour ne garder que les Congrès et Ateliers
+// 1. Filtrage : On garde les deux types demandés
 const onlyCongresEtAteliers = computed(() => {
-    return allEvents.value.filter(event => event.eventType === 'Congrès' || event.eventType === 'Atelier')
+    return allEvents.value.filter(event => 
+        event.eventType === 'Congrès' || event.eventType === 'Atelier'
+    )
 })
 
-// Découper pour la pagination
+// 2. Pagination : On découpe la liste filtrée
 const paginatedCongresEtAteliers = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage
     const end = start + itemsPerPage
     return onlyCongresEtAteliers.value.slice(start, end)
 })
 
+// 3. Calcul du nombre de pages
 const pageCount = computed(() => {
     return Math.ceil(onlyCongresEtAteliers.value.length / itemsPerPage)
 })
@@ -28,27 +31,22 @@ const pageCount = computed(() => {
 // --- APPEL API ---
 const fetchEvents = async () => {
     try {
-        // On suppose que ton endpoint est /api/events
+        // On récupère tout pour pouvoir filtrer correctement sur le front
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events`)
         if (!response.ok) throw new Error('Erreur lors du chargement des événements')
         const data = await response.json()
         allEvents.value = data
     } catch (error) {
-        errorMessage.value = "Impossible de charger les séminaires."
+        errorMessage.value = "Impossible de charger les congrès et ateliers."
         console.error(error)
     } finally {
         isLoading.value = false
     }
 }
 
-// --- FORMATTAGE DES DATES ---
-const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('fr-CA', {
-        day: 'numeric', month: 'long', year: 'numeric'
-    })
-}
-
+// --- FORMATTAGE ---
 const formatTime = (dateString) => {
+    if (!dateString) return ''
     return new Date(dateString).toLocaleTimeString('fr-CA', {
         hour: '2-digit', minute: '2-digit'
     })
@@ -74,19 +72,22 @@ onMounted(fetchEvents)
                 <v-col v-for="event in paginatedCongresEtAteliers" :key="event.id" cols="12">
                     <v-card variant="outlined" class="mb-4 border-sm overflow-hidden">
                         <v-row no-gutters>
-                            <v-col cols="12" md="3"
-                                class="bg-grey-lighten-4 d-flex flex-column align-center justify-center pa-4 text-center">
-                                <v-icon color="primary" size="32" class="mb-2">mdi-calendar-range</v-icon>
+                            
+                            <v-col cols="12" md="3" class="bg-grey-lighten-4 d-flex flex-column align-center justify-center pa-4 text-center">
+                                <v-icon color="primary" size="32" class="mb-2">mdi-account-group</v-icon>
                                 <div class="text-h5 font-weight-bold text-primary">
                                     {{ new Date(event.startDate).getDate() }}
                                 </div>
                                 <div class="text-uppercase font-weight-medium">
                                     {{ new Date(event.startDate).toLocaleDateString('fr-CA', { month: 'short' }) }}
                                 </div>
-                                <div class="text-caption text-grey-darken-1">{{ new Date(event.startDate).getFullYear() }}</div>
+                                <div class="text-caption text-grey-darken-1">
+                                    {{ new Date(event.startDate).getFullYear() }}
+                                </div>
                             </v-col>
 
                             <v-col cols="12" md="9" class="pa-6">
+
                                 <v-card-title class="text-h5 font-weight-bold px-0 pt-0 text-wrap">
                                     {{ event.title }}
                                 </v-card-title>
@@ -112,8 +113,12 @@ onMounted(fetchEvents)
 
             <v-row v-if="pageCount > 1" justify="center" class="mt-8">
                 <v-col cols="12" md="6">
-                    <v-pagination v-model="currentPage" :length="pageCount" rounded="circle"
-                        color="primary"></v-pagination>
+                    <v-pagination 
+                        v-model="currentPage" 
+                        :length="pageCount" 
+                        rounded="circle"
+                        color="primary"
+                    ></v-pagination>
                 </v-col>
             </v-row>
 
