@@ -5,6 +5,8 @@ import MissionView from './views/MissionView.vue'
 import ValeursView from './views/ValeursView.vue'
 import ThematiquesView from './views/ThematiquesView.vue'
 import NousJoindreView from './views/NousJoindreView.vue'
+import NouvellesView from './views/NouvellesView.vue'
+import NouvelleView from './views/NouvelleView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,6 +32,17 @@ const router = createRouter({
           { title: 'Accueil', to: '/' }, { title: 'Nous joindre', to: '/nous-joindre' } ] 
         } 
     },
+    { path: '/nouvelles', name: 'nouvelles', component: NouvellesView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' } ] 
+        }
+    },
+    { path: '/nouvelles/:id', name: 'nouvelle', component: NouvelleView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id', to: '' } ] 
+        }
+    }
+
   ]
 })
 
