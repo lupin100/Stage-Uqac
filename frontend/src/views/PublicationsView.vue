@@ -64,8 +64,8 @@ onMounted(fetchPublications)
                             </v-col>
 
                             <v-col cols="12" md="8" class="pa-4">
-                                <div class="mb-1">
-                                    <v-chip size="x-small" variant="tonal" color="primary" class="font-weight-bold">
+                                <div class="mb-4">
+                                    <v-chip variant="tonal" color="primary" class="font-weight-bold">
                                         {{ pub.publicationType }}
                                     </v-chip>
                                 </div>
