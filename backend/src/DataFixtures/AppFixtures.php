@@ -54,7 +54,7 @@ class AppFixtures extends Fixture
             $news->setTitle($title)
                  ->setContent($faker->realText(800))
                  ->setPublishedAt(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-2 year', 'now')))
-                 ->setImagePath($faker->imageUrl(800, 600, 'technics', true));
+                 ->setImagePath('https://loremflickr.com/800/600/computer,technology?lock=' . $i);
             
             $manager->persist($news);
         }
