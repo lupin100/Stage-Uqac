@@ -65,6 +65,7 @@ const breadcrumbs = computed(() => {
             <img src="https://flagcdn.com/w20/fr.png" alt="Français" />
             <span>Fr</span>
           </a>
+          <span>|</span>
           <a href="#" class="lang-link">
             <img src="https://flagcdn.com/w20/gb.png" alt="English" />
             <span>En</span>
@@ -120,8 +121,8 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
-              <v-list-item title="Séminaires" to="/evenements/seminaires" />
-              <v-list-item title="Congrès et ateliers" to="/evenements/congresetateliers" />
+              <v-list-item title="Séminaires" to="/seminaires" />
+              <v-list-item title="Congrès et ateliers" to="/congres-et-ateliers" />
             </v-list>
           </v-menu>
         </v-tab>

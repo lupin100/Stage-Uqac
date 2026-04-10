@@ -7,6 +7,12 @@ import ThematiquesView from './views/ThematiquesView.vue'
 import NousJoindreView from './views/NousJoindreView.vue'
 import NouvellesView from './views/NouvellesView.vue'
 import NouvelleView from './views/NouvelleView.vue'
+import SeminairesView from './views/SeminairesView.vue'
+import SeminaireView from './views/SeminaireView.vue'
+import CongresEtAteliersView from './views/CongresEtAteliers.vue'
+import CongresEtAtelierView from './views/CongresEtAtelier.vue'
+import PublicationsView from './views/PublicationsView.vue'
+import EvenementsView from './views/Evenements.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,10 +45,30 @@ const router = createRouter({
     },
     { path: '/nouvelles/:id', name: 'nouvelle', component: NouvelleView, meta: {
       breadcrumb: [
-          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id', to: '' } ] 
+          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id' } ] 
         }
-    }
-
+    },
+    { path: '/seminaires', name: 'seminaires', component: SeminairesView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Séminaires', to: '/seminaires' } ] 
+        }
+    },
+    { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ]
+    } },
+    { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
+    },
+    { path: '/congres-et-ateliers/:id', name: 'congres-et-atelier', component: CongresEtAtelierView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
+    } },
+    { path: '/publications', name: 'publications', component: PublicationsView, meta: {
+      breadcrumb: [
+          { title: 'Accueil', to: '/' }, { title: 'Publications', to: '/publications' } ] } 
+    },
+    { path: '/evenements', name: 'evenements', component: EvenementsView, meta: {
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Événements', to: '/evenements' } ] }
+    },
   ]
 })
 

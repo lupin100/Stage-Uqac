@@ -13,7 +13,7 @@ class News
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 2500)]
+    #[ORM\Column(length: 5000)]
     private ?string $content = null;
 
     #[ORM\Column]

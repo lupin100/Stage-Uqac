@@ -18,11 +18,39 @@ class NewsController extends AbstractController
 {
     /**
      * GET ALL : Liste des actualités, les plus récentes en premier
+     * Supporte la pagination via les paramètres "page" et "limit"
      */
     #[Route('', name: 'app_news_index', methods: ['GET'])]
-    public function index(NewsRepository $repository): JsonResponse
+    public function index(Request $request, NewsRepository $repository): JsonResponse
     {
-        return $this->json($repository->findBy([], ['publishedAt' => 'DESC']), Response::HTTP_OK);
+        $page = $request->query->get('page');
+
+        // pas de page précisé -> envoie toutes les données
+        if ($page === null) {
+            $news = $repository->findBy([], ['publishedAt' => 'DESC']);
+            return $this->json($news, Response::HTTP_OK);
+        }
+
+        // avec page spec -> pagination
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 10));
+        $offset = ($page - 1) * $limit;
+
+        $news = $repository->findBy(
+            [],
+            ['publishedAt' => 'DESC'],
+            $limit,
+            $offset
+        );
+
+        $total = $repository->count([]);
+
+        return $this->json([
+            'data' => $news,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total
+        ]);
     }
 
     /**
