@@ -27,4 +27,4 @@ EXPOSE 8001
 #CMD ["php", "-S", "0.0.0.0:8001", "-t", "public"]
 
 # On lance les migrations et les fixtures avant de démarrer le serveur
-CMD ["sh", "-c", "php bin/console cache:clear --no-warmup && php bin/console cache:warmup && php bin/console doctrine:migrations:migrate --no-interaction && php bin/console doctrine:fixtures:load --no-interaction && php -S 0.0.0.0:8001 -t public"]
+CMD ["sh", "-c", "php bin/console doctrine:migrations:migrate --no-interaction && php bin/console doctrine:fixtures:load --no-interaction && php -S 0.0.0.0:8001 -t public"]
