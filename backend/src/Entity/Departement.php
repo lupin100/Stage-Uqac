@@ -19,6 +19,9 @@ class Departement
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $url = null;
 
+    #[ORM\OneToOne(mappedBy: 'departement', cascade: ['persist', 'remove'])]
+    private ?Person $person = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -47,4 +50,28 @@ class Departement
 
         return $this;
     }
+
+    public function getPerson(): ?Person
+    {
+        return $this->person;
+    }
+
+    public function setPerson(?Person $person): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($person === null && $this->person !== null) {
+            $this->person->setDepartement(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($person !== null && $person->getDepartement() !== $this) {
+            $person->setDepartement($this);
+        }
+
+        $this->person = $person;
+
+        return $this;
+    }
+
+
 }
