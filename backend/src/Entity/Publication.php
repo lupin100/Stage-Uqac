@@ -30,6 +30,9 @@ class Publication
     #[ORM\Column(enumType: PublicationEnum::class)]
     private ?PublicationEnum $publicationType = null;
 
+    #[ORM\ManyToOne(inversedBy: 'publications')]
+    private ?Contributor $contributor = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,6 +82,18 @@ class Publication
     public function setPublicationType(PublicationEnum $publicationType): static
     {
         $this->publicationType = $publicationType;
+
+        return $this;
+    }
+
+    public function getContributor(): ?Contributor
+    {
+        return $this->contributor;
+    }
+
+    public function setContributor(?Contributor $contributor): static
+    {
+        $this->contributor = $contributor;
 
         return $this;
     }

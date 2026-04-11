@@ -22,6 +22,9 @@ class StudentProfile
     #[ORM\OneToOne(mappedBy: 'studentProfile', cascade: ['persist', 'remove'])]
     private ?Person $person = null;
 
+    #[ORM\ManyToOne(inversedBy: 'studentProfile')]
+    private ?StudentDegree $studentDegree = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +72,18 @@ class StudentProfile
         }
 
         $this->person = $person;
+
+        return $this;
+    }
+
+    public function getStudentDegree(): ?StudentDegree
+    {
+        return $this->studentDegree;
+    }
+
+    public function setStudentDegree(?StudentDegree $studentDegree): static
+    {
+        $this->studentDegree = $studentDegree;
 
         return $this;
     }

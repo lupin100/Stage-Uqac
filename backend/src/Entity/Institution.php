@@ -24,6 +24,9 @@ class Institution
     #[ORM\OneToOne(mappedBy: 'institution', cascade: ['persist', 'remove'])]
     private ?Person $person = null;
 
+    #[ORM\ManyToOne(inversedBy: 'institution')]
+    private ?Departement $departement = null;
+
 
 
     public function getId(): ?int
@@ -73,6 +76,18 @@ class Institution
         }
 
         $this->person = $person;
+
+        return $this;
+    }
+
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
 
         return $this;
     }
