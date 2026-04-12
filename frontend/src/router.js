@@ -13,6 +13,7 @@ import CongresEtAteliersView from './views/CongresEtAteliers.vue'
 import CongresEtAtelierView from './views/CongresEtAtelier.vue'
 import PublicationsView from './views/PublicationsView.vue'
 import EvenementsView from './views/Evenements.vue'
+import ProjectsView from './views/ProjetsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -69,6 +70,10 @@ const router = createRouter({
     { path: '/evenements', name: 'evenements', component: EvenementsView, meta: {
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Événements', to: '/evenements' } ] }
     },
+    {
+      path: '/projets', name: 'projets', component: ProjectsView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Projets', to: '/projets' } ] }
+    }
   ]
 })
 

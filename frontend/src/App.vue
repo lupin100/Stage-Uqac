@@ -1,5 +1,5 @@
 <script setup>
-// Importation de nos composants enfants
+// Importation des composants enfants
 import AppHeader from './components/AppHeader.vue'
 import AppFooter from './components/AppFooter.vue'
 </script>
@@ -15,3 +15,4 @@ import AppFooter from './components/AppFooter.vue'
     <AppFooter />
   </v-app>
 </template>
+
