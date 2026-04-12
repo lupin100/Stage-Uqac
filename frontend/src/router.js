@@ -14,6 +14,8 @@ import CongresEtAtelierView from './views/CongresEtAtelier.vue'
 import PublicationsView from './views/PublicationsView.vue'
 import EvenementsView from './views/Evenements.vue'
 import ProjectsView from './views/ProjetsView.vue'
+import MembresReguliersView from './views/MembresReguliersView.vue'
+import MembreCollaboView from './views/MembreCollaboView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -73,6 +75,15 @@ const router = createRouter({
     {
       path: '/projets', name: 'projets', component: ProjectsView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Projets', to: '/projets' } ] }
+    },
+    {
+      path: '/membres-reguliers', name: 'membres-reguliers', component: MembresReguliersView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' } ] }
+
+    },
+    {
+      path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: 'Détail du membre' } ] }
     }
   ]
 })
