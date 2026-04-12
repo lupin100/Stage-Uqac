@@ -271,9 +271,12 @@ onMounted(() => {
                     }) }}
                   </p>
 
-                  <p class="news-title">
+                  <router-link
+                    :to="{ name: 'nouvelle', params: { id: news.id } }"
+                    class="news-title-link"
+                  >
                     {{ news.title }}
-                  </p>
+                  </router-link>
                 </div>
               </div>
               <div class="publications-header">
@@ -319,7 +322,29 @@ onMounted(() => {
 
                 <div class="event-content">
                   <p class="event-type">{{ event.eventType }}</p>
-                  <p class="event-title">{{ event.title }}</p>
+                  <!-- <p class="event-title">{{ event.title }}</p> -->
+                   <router-link
+                      v-if="event.eventType?.toLowerCase() === 'séminaire'"
+                      :to="{ name: 'seminaire', params: { id: event.id } }"
+                      class="event-title-link"
+                    >
+                      {{ event.title }}
+                    </router-link>
+
+                    <router-link
+                      v-else-if="
+                        event.eventType?.toLowerCase() === 'congrès' ||
+                        event.eventType?.toLowerCase() === 'atelier'
+                      "
+                      :to="{ name: 'congres-et-atelier', params: { id: event.id } }"
+                      class="event-title-link"
+                    >
+                      {{ event.title }}
+                    </router-link>
+
+                    <p v-else class="event-title">
+                      {{ event.title }}
+                    </p>
                 </div>
               </div>
               <div class="publications-header">
@@ -331,6 +356,7 @@ onMounted(() => {
           </v-col>
         </v-row>
 
+        <!-- PUBLICATIONS -->
         <v-row class="mt-10">
           <v-col cols="12">
             <div class="section-header">Publications</div>
@@ -353,7 +379,7 @@ onMounted(() => {
 
             <div v-else class="publications-list">
               <div class="publications-grid">
-                <div
+                <!-- <div
                   v-for="publication in latestPublications"
                   :key="publication.id"
                   class="publication-item"
@@ -361,6 +387,32 @@ onMounted(() => {
                   <p class="publication-title">
                     {{ publication.title }}
                   </p>
+                </div> -->
+                <div
+                  v-for="publication in latestPublications"
+                  :key="publication.id"
+                  class="publication-item"
+                >
+                  <a
+                    v-if="publication.externalUrl"
+                    :href="publication.externalUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="publication-title-link"
+                  >
+                    {{ publication.title }}
+                  </a>
+
+                  <v-tooltip v-else text="Lien non disponible" location="top">
+                    <template #activator="{ props }">
+                      <p
+                        v-bind="props"
+                        class="publication-title no-link"
+                      >
+                        {{ publication.title }}
+                      </p>
+                    </template>
+                  </v-tooltip>
                 </div>
               </div>
 
@@ -435,6 +487,18 @@ onMounted(() => {
   margin: 0;
 }
 
+.news-title-link {
+  color: #2b8ccf;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.news-title-link:hover {
+  text-decoration: underline;
+}
+
 .event-date-box {
   width: 100px;
   min-width: 100px;
@@ -482,6 +546,19 @@ onMounted(() => {
   line-height: 1.35;
   margin: 0;
 }
+
+.event-title-link {
+  color: #2b8ccf;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.event-title-link:hover {
+  text-decoration: underline;
+}
+
 
 @media (max-width: 960px) {
   .news-item,
@@ -558,5 +635,25 @@ onMounted(() => {
 
 .all-link:hover {
   text-decoration: underline;
+}
+
+.publication-title-link {
+  display: inline-block;
+  color: #2b8ccf;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.publication-title-link:visited {
+  color: #551A8B;
+}
+
+.publication-title-link:hover {
+  text-decoration: underline;
+}
+
+.no-link {
+  cursor: not-allowed;
 }
 </style>
