@@ -41,7 +41,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <!-- <v-col cols="12" md="6"> -->
+    <div class="section-block">
         <div class="section-header">Nouvelles</div>
 
         <v-progress-circular v-if="isLoadingNews" indeterminate color="primary" class="mt-4" />
@@ -77,89 +77,130 @@ onMounted(() => {
                 </router-link>
             </div>
         </div>
-    <!-- </v-col> -->
+    </div>
 </template>
 
 <style scoped>
-.section-header {
-  display: inline-block;
-  background-color: #6b8e00;
-  color: white;
-  font-weight: 700;
-  font-size: 1.2rem;
-  padding: 14px 28px;
-  margin-bottom: 0;
+.section-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
 }
 
+.section-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    min-width: 190px;
+    min-height: 56px;
+    background-color: #6b8e00;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 14px 28px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+
+/* .section-header {
+    display: inline-block;
+    background-color: #6b8e00;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 14px 28px;
+    margin-bottom: 0;
+} */
+
 .news-list {
-  border-top: 2px solid #bdbdbd;
+    border-top: 2px solid #bdbdbd;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.section-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .news-item {
-  display: flex;
-  gap: 18px;
-  padding: 14px 0;
-  border-bottom: 2px solid #c7c7c7;
+    display: flex;
+    flex: 1;
+    gap: 18px;
+    padding: 14px 0;
+    border-bottom: 2px solid #c7c7c7;
 }
 
 .news-image-wrapper {
-  width: 190px;
-  min-width: 190px;
+    width: 190px;
+    min-width: 190px;
 }
 
 .news-image {
-  width: 190px;
-  height: 140px;
-  border: 1px solid #cfcfcf;
+    width: 190px;
+    height: 140px;
+    border: 1px solid #cfcfcf;
 }
 
-.news-content,
-.event-content {
-  flex: 1;
-  text-align: left;
+.news-content {
+    flex: 1;
+    text-align: left;
 }
 
 .news-date {
-  font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 10px;
-  text-transform: capitalize;
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 10px;
+    text-transform: capitalize;
 }
 
 .news-title {
-  font-size: 1.1rem;
-  font-weight: 500;
-  line-height: 1.3;
-  color: #222;
-  margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #222;
+    margin: 0;
 }
 
 .news-title-link {
-  color: #2b8ccf;
-  text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 500;
-  line-height: 1.3;
+    color: #2b8ccf;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.3;
 }
 
 .news-title-link:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 @media (max-width: 960px) {
-  .news-item {
-    align-items: flex-start;
-  }
+    .news-item {
+        align-items: flex-start;
+    }
 
-  .news-image-wrapper {
-    width: 130px;
-    min-width: 130px;
-  }
+    .news-image-wrapper {
+        width: 130px;
+        min-width: 130px;
+    }
 
-  .news-image {
-    width: 130px;
-    height: 100px;
-  }
+    .news-image {
+        width: 130px;
+        height: 100px;
+    }
 }
 
+.all-link {
+  color: #2b8ccf;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.all-link:hover {
+  text-decoration: underline;
+}
 </style>
