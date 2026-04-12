@@ -146,4 +146,20 @@ onMounted(() => {
   text-decoration: underline;
 }
 
+@media (max-width: 960px) {
+  .news-item {
+    align-items: flex-start;
+  }
+
+  .news-image-wrapper {
+    width: 130px;
+    min-width: 130px;
+  }
+
+  .news-image {
+    width: 130px;
+    height: 100px;
+  }
+}
+
 </style>
