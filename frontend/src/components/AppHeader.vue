@@ -10,7 +10,7 @@ const route = useRoute()
 
 const breadcrumbs = computed(() => {
   const metaBreadcrumbs = route.meta.breadcrumb || []
-  
+
   return metaBreadcrumbs.map(item => {
     // Si le titre est celui de la nouvelle dynamique
     if (item.title === 'Nouvelle/:id') {
@@ -31,28 +31,19 @@ const breadcrumbs = computed(() => {
     <div class="black-bar">
       <div class="black-bar-content">
         <a href="https://www.uqac.ca/" target="_blank" class="d-flex mr-4" style="width: 120px;">
-        <v-img
-          :src="logo"
-          width="120"
-          contain
-        />
-      </a>
+          <v-img :src="logo" width="120" contain />
+        </a>
 
         <div class="header-title">
           <router-link to="/" class="text-decoration-none text-white">
-          Groupe de recherches informatique (GRI)
-        </router-link>
+            Groupe de recherches informatique (GRI)
+          </router-link>
         </div>
 
-        <v-text-field
-          density="compact"
-          variant="solo"
-          placeholder="Rechercher..."
-          hide-details
-          prepend-inner-icon="mdi-magnify"
-          class="search-field"
-          rounded="pill"
-        />
+        <v-text-field density="compact" variant="solo" placeholder="Rechercher..." hide-details
+          prepend-inner-icon="mdi-magnify" class="search-field" rounded="pill" />
+
+        <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" to="/admin-connexion"> </v-btn>
       </div>
     </div>
 
@@ -76,11 +67,7 @@ const breadcrumbs = computed(() => {
 
     <!-- Barre verte -->
     <div class="green-bar">
-      <v-tabs
-        bg-color="#6b8915"
-        color="white"
-        grow
-      >
+      <v-tabs bg-color="#6b8915" color="white" grow>
         <v-tab to="/">Accueil</v-tab>
 
         <v-tab>
