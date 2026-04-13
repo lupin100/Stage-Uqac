@@ -24,7 +24,7 @@ const vuetify = createVuetify({
         dark: false,
         colors: {
           primary: '#6B8915', // UQAC
-          secondary: '#424242',
+          secondary: '#13100D',
           accent: '#82B1FF',
           error: '#FF5252',
           info: '#2196F3',
