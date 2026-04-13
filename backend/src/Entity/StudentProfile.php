@@ -19,6 +19,12 @@ class StudentProfile
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coSupervisor = null;
 
+    #[ORM\OneToOne(mappedBy: 'studentProfile', cascade: ['persist', 'remove'])]
+    private ?Person $person = null;
+
+    #[ORM\ManyToOne(inversedBy: 'studentProfile')]
+    private ?StudentDegree $studentDegree = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +50,40 @@ class StudentProfile
     public function setCoSupervisor(?string $coSupervisor): static
     {
         $this->coSupervisor = $coSupervisor;
+
+        return $this;
+    }
+
+    public function getPerson(): ?Person
+    {
+        return $this->person;
+    }
+
+    public function setPerson(?Person $person): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($person === null && $this->person !== null) {
+            $this->person->setStudentProfile(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($person !== null && $person->getStudentProfile() !== $this) {
+            $person->setStudentProfile($this);
+        }
+
+        $this->person = $person;
+
+        return $this;
+    }
+
+    public function getStudentDegree(): ?StudentDegree
+    {
+        return $this->studentDegree;
+    }
+
+    public function setStudentDegree(?StudentDegree $studentDegree): static
+    {
+        $this->studentDegree = $studentDegree;
 
         return $this;
     }

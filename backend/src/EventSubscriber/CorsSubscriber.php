@@ -16,12 +16,14 @@ class CorsSubscriber implements EventSubscriberInterface
     }
 
     public function onKernelResponse(ResponseEvent $event): void
-    {
-        $response = $event->getResponse();
+{
+    $response = $event->getResponse();
+    $response->headers->set('Access-Control-Allow-Origin', '*');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    $response->headers->set('Vary', 'Origin');
+}
 
-        // On autorise l'adresse du frontend Vue.js (port 5173)
-        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:5173');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    }
+    
 }

@@ -53,6 +53,15 @@ class Person
     #[ORM\Column(enumType: PersonEnum::class)]
     private ?PersonEnum $role = null;
 
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    private ?Institution $institution = null;
+
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    private ?Departement $departement = null;
+
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    private ?StudentProfile $studentProfile = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -186,6 +195,42 @@ class Person
     public function setRole(PersonEnum $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    public function getInstitution(): ?Institution
+    {
+        return $this->institution;
+    }
+
+    public function setInstitution(?Institution $institution): static
+    {
+        $this->institution = $institution;
+
+        return $this;
+    }
+
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+
+        return $this;
+    }
+
+    public function getStudentProfile(): ?StudentProfile
+    {
+        return $this->studentProfile;
+    }
+
+    public function setStudentProfile(?StudentProfile $studentProfile): static
+    {
+        $this->studentProfile = $studentProfile;
 
         return $this;
     }

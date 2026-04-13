@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ContributorRepository;
 use BcMath\Number;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,6 +22,17 @@ class Contributor
 
     #[ORM\Column(length: 255)]
     private ?string $displayName = null;
+
+    /**
+     * @var Collection<int, Publication>
+     */
+    #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'contributor')]
+    private Collection $publications;
+
+    public function __construct()
+    {
+        $this->publications = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,6 +59,36 @@ class Contributor
     public function setDisplayName(string $displayName): static
     {
         $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Publication>
+     */
+    public function getPublications(): Collection
+    {
+        return $this->publications;
+    }
+
+    public function addPublication(Publication $publication): static
+    {
+        if (!$this->publications->contains($publication)) {
+            $this->publications->add($publication);
+            $publication->setContributor($this);
+        }
+
+        return $this;
+    }
+
+    public function removePublication(Publication $publication): static
+    {
+        if ($this->publications->removeElement($publication)) {
+            // set the owning side to null (unless already changed)
+            if ($publication->getContributor() === $this) {
+                $publication->setContributor(null);
+            }
+        }
 
         return $this;
     }

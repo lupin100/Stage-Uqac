@@ -13,6 +13,10 @@ import CongresEtAteliersView from './views/CongresEtAteliers.vue'
 import CongresEtAtelierView from './views/CongresEtAtelier.vue'
 import PublicationsView from './views/PublicationsView.vue'
 import EvenementsView from './views/Evenements.vue'
+import ProjectsView from './views/ProjetsView.vue'
+import MembresReguliersView from './views/MembresReguliersView.vue'
+import MembreCollaboView from './views/MembreCollaboView.vue'
+import ConnexionView from './views/admin/ConnexionView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -54,7 +58,7 @@ const router = createRouter({
         }
     },
     { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ] // utiliser la même fonction que pour les nouvelles
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ]
     } },
     { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
@@ -69,7 +73,23 @@ const router = createRouter({
     { path: '/evenements', name: 'evenements', component: EvenementsView, meta: {
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Événements', to: '/evenements' } ] }
     },
+    {
+      path: '/projets', name: 'projets', component: ProjectsView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Projets', to: '/projets' } ] }
+    },
+    {
+      path: '/membres-reguliers', name: 'membres-reguliers', component: MembresReguliersView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' } ] }
 
+    },
+    {
+      path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: 'Détail du membre' } ] }
+    },
+    {
+      path: '/admin-connexion', name: 'admin-connexion', component: ConnexionView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Admin', to: '/admin-connexion' } ] }
+    }
   ]
 })
 
