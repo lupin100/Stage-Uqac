@@ -4,63 +4,85 @@ namespace App\Entity;
 
 use App\Enum\PersonEnum;
 use App\Repository\PersonRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
+#[ORM\HasLifecycleCallbacks] 
 class Person
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['person:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 2500, nullable: true)]
+    #[Groups(['person:read'])]
     private ?string $biography = null;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    #[Groups(['person:read'])]
+    private ?bool $isActive = true;
 
     #[ORM\Column]
+    #[Groups(['person:read'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    #[Groups(['person:read'])]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(length: 100)]
+    #[Groups(['person:read'])]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 100)]
+    #[Groups(['person:read'])]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['person:read'])]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['person:read'])]
+    private ?string $photoPath = null;
+
+    #[ORM\Column(length: 150, nullable: true)]
+    #[Groups(['person:read'])]
+    private ?string $jobTitle = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['person:read'])]
+    private ?string $personalPageUrl = null;
+
+    #[ORM\Column(enumType: PersonEnum::class)]
+    #[Groups(['person:read'])]
+    private ?PersonEnum $role = null;
+
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    #[Groups(['person:read'])]
+    private ?Institution $institution = null;
+
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    #[Groups(['person:read'])]
+    private ?Departement $departement = null;
+
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    #[Groups(['person:read'])]
+    private ?StudentProfile $studentProfile = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     #[ORM\PreUpdate]
     public function updateTimestamp(): void {
         $this->updatedAt = new \DateTimeImmutable();
     }
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $firstName = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $lastName = null;
-
-    #[ORM\Column(length: 180, nullable: true)]
-    private ?string $email = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $photoPath = null;
-
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $jobTitle = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $personalPageUrl = null;
-
-    #[ORM\Column(enumType: PersonEnum::class)]
-    private ?PersonEnum $role = null;
-
-    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
-    private ?Institution $institution = null;
-
-    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
-    private ?Departement $departement = null;
-
-    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
-    private ?StudentProfile $studentProfile = null;
 
     public function getId(): ?int
     {
@@ -75,7 +97,6 @@ class Person
     public function setBiography(?string $biography): static
     {
         $this->biography = $biography;
-
         return $this;
     }
 
@@ -87,7 +108,6 @@ class Person
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
-
         return $this;
     }
 
@@ -99,7 +119,6 @@ class Person
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -111,7 +130,6 @@ class Person
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
@@ -123,7 +141,6 @@ class Person
     public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -135,7 +152,6 @@ class Person
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -147,7 +163,6 @@ class Person
     public function setEmail(?string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -159,7 +174,6 @@ class Person
     public function setPhotoPath(?string $photoPath): static
     {
         $this->photoPath = $photoPath;
-
         return $this;
     }
 
@@ -171,7 +185,6 @@ class Person
     public function setJobTitle(?string $jobTitle): static
     {
         $this->jobTitle = $jobTitle;
-
         return $this;
     }
 
@@ -183,7 +196,6 @@ class Person
     public function setPersonalPageUrl(?string $personalPageUrl): static
     {
         $this->personalPageUrl = $personalPageUrl;
-
         return $this;
     }
 
@@ -195,7 +207,6 @@ class Person
     public function setRole(PersonEnum $role): static
     {
         $this->role = $role;
-
         return $this;
     }
 
@@ -207,7 +218,6 @@ class Person
     public function setInstitution(?Institution $institution): static
     {
         $this->institution = $institution;
-
         return $this;
     }
 
@@ -219,7 +229,6 @@ class Person
     public function setDepartement(?Departement $departement): static
     {
         $this->departement = $departement;
-
         return $this;
     }
 
@@ -231,7 +240,6 @@ class Person
     public function setStudentProfile(?StudentProfile $studentProfile): static
     {
         $this->studentProfile = $studentProfile;
-
         return $this;
     }
 }

@@ -4,11 +4,8 @@ namespace App\Entity;
 
 use App\Enum\PublicationEnum;
 use App\Repository\PublicationRepository;
-use BcMath\Number;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; // Import crucial
 
 #[ORM\Entity(repositoryClass: PublicationRepository::class)]
 class Publication
@@ -16,21 +13,27 @@ class Publication
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?int $year = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?string $externalUrl = null;
 
     #[ORM\Column(enumType: PublicationEnum::class)]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?PublicationEnum $publicationType = null;
 
     #[ORM\ManyToOne(inversedBy: 'publications')]
+    #[Groups(['publication:read'])]
     private ?Contributor $contributor = null;
 
     public function getId(): ?int
@@ -46,7 +49,6 @@ class Publication
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -58,7 +60,6 @@ class Publication
     public function setYear(int $year): static
     {
         $this->year = $year;
-
         return $this;
     }
 
@@ -70,7 +71,6 @@ class Publication
     public function setExternalUrl(?string $externalUrl): static
     {
         $this->externalUrl = $externalUrl;
-
         return $this;
     }
 
@@ -82,7 +82,6 @@ class Publication
     public function setPublicationType(PublicationEnum $publicationType): static
     {
         $this->publicationType = $publicationType;
-
         return $this;
     }
 
@@ -94,7 +93,6 @@ class Publication
     public function setContributor(?Contributor $contributor): static
     {
         $this->contributor = $contributor;
-
         return $this;
     }
 }

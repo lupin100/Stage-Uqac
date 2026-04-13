@@ -17,21 +17,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class PublicationController extends AbstractController
 {
     /**
-     * GET ALL : Liste toutes les publications, classées par année (plus récent d'abord)
-     * Supporte la pagination via les paramètres "page" et "limit"
+     * GET ALL : Liste toutes les publications avec leur contributeur
      */
     #[Route('', name: 'app_publication_index', methods: ['GET'])]
     public function index(Request $request, PublicationRepository $repository): JsonResponse
     {
         $page = $request->query->get('page');
 
-        // pas de page précisé -> envoie toutes les données
         if ($page === null) {
             $publications = $repository->findBy([], ['year' => 'DESC']);
-            return $this->json($publications, Response::HTTP_OK);
+            return $this->json($publications, Response::HTTP_OK, [], ['groups' => 'publication:read']);
         }
 
-        // avec page spec -> pagination
         $page = max(1, (int) $page);
         $limit = max(1, (int) $request->query->get('limit', 10));
         $offset = ($page - 1) * $limit;
@@ -50,7 +47,7 @@ class PublicationController extends AbstractController
             'page' => $page,
             'limit' => $limit,
             'total' => $total
-        ]);
+        ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
     }
 
     /**
@@ -58,8 +55,8 @@ class PublicationController extends AbstractController
      */
     #[Route('', name: 'app_publication_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -74,7 +71,7 @@ class PublicationController extends AbstractController
             $em->persist($publication);
             $em->flush();
 
-            return $this->json($publication, Response::HTTP_CREATED);
+            return $this->json($publication, Response::HTTP_CREATED, [], ['groups' => 'publication:read']);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
         }
@@ -86,7 +83,7 @@ class PublicationController extends AbstractController
     #[Route('/{id}', name: 'app_publication_show', methods: ['GET'])]
     public function show(Publication $publication): JsonResponse
     {
-        return $this->json($publication, Response::HTTP_OK);
+        return $this->json($publication, Response::HTTP_OK, [], ['groups' => 'publication:read']);
     }
 
     /**
@@ -94,21 +91,21 @@ class PublicationController extends AbstractController
      */
     #[Route('/{id}', name: 'app_publication_update', methods: ['PATCH'])]
     public function update(
-        Publication $publication, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Publication $publication,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Publication::class, 
-            'json', 
+            $request->getContent(),
+            Publication::class,
+            'json',
             ['object_to_populate' => $publication]
         );
 
         $em->flush();
 
-        return $this->json($publication, Response::HTTP_OK);
+        return $this->json($publication, Response::HTTP_OK, [], ['groups' => 'publication:read']);
     }
 
     /**
@@ -120,6 +117,6 @@ class PublicationController extends AbstractController
         $em->remove($publication);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_OK);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -3,11 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ContributorRepository;
-use BcMath\Number;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 class Contributor
@@ -15,18 +14,22 @@ class Contributor
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?int $contributorOrder = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['contributor:read', 'publication:read'])]
     private ?string $displayName = null;
 
     /**
      * @var Collection<int, Publication>
      */
     #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'contributor')]
+    #[Groups(['contributor:read'])]
     private Collection $publications;
 
     public function __construct()
@@ -47,7 +50,6 @@ class Contributor
     public function setContributorOrder(int $contributorOrder): static
     {
         $this->contributorOrder = $contributorOrder;
-
         return $this;
     }
 
@@ -59,7 +61,6 @@ class Contributor
     public function setDisplayName(string $displayName): static
     {
         $this->displayName = $displayName;
-
         return $this;
     }
 
@@ -84,7 +85,6 @@ class Contributor
     public function removePublication(Publication $publication): static
     {
         if ($this->publications->removeElement($publication)) {
-            // set the owning side to null (unless already changed)
             if ($publication->getContributor() === $this) {
                 $publication->setContributor(null);
             }

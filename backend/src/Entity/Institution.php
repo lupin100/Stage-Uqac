@@ -3,31 +3,32 @@
 namespace App\Entity;
 
 use App\Repository\InstitutionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups; 
 #[ORM\Entity(repositoryClass: InstitutionRepository::class)]
 class Institution
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['person:read', 'institution:read', 'departement:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['person:read', 'institution:read', 'departement:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['person:read', 'institution:read', 'departement:read'])]
     private ?string $url = null;
 
     #[ORM\OneToOne(mappedBy: 'institution', cascade: ['persist', 'remove'])]
+    #[Groups(['institution:read'])]
     private ?Person $person = null;
 
     #[ORM\ManyToOne(inversedBy: 'institution')]
+    #[Groups(['person:read', 'institution:read'])]
     private ?Departement $departement = null;
-
-
 
     public function getId(): ?int
     {
@@ -42,7 +43,6 @@ class Institution
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -54,7 +54,6 @@ class Institution
     public function setUrl(?string $url): static
     {
         $this->url = $url;
-
         return $this;
     }
 
@@ -65,18 +64,15 @@ class Institution
 
     public function setPerson(?Person $person): static
     {
-        // unset the owning side of the relation if necessary
         if ($person === null && $this->person !== null) {
             $this->person->setInstitution(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($person !== null && $person->getInstitution() !== $this) {
             $person->setInstitution($this);
         }
 
         $this->person = $person;
-
         return $this;
     }
 
@@ -88,8 +84,6 @@ class Institution
     public function setDepartement(?Departement $departement): static
     {
         $this->departement = $departement;
-
         return $this;
     }
-
 }
