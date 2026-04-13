@@ -21,10 +21,13 @@ COPY . .
 # Installation des dépendances PHP
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# On expose le port et on lance le serveur via Symfony CLI
+COPY start.sh /usr/local/bin/start.sh
+
+RUN sed -i 's/\r$//' /usr/local/bin/start.sh && \
+    chmod +x /usr/local/bin/start.sh
+
 EXPOSE 8001
 
-#CMD ["php", "-S", "0.0.0.0:8001", "-t", "public"]
+ENTRYPOINT ["/usr/local/bin/start.sh"]
 
-# On lance les migrations et les fixtures avant de démarrer le serveur
-CMD ["sh", "-c", "php bin/console doctrine:migrations:migrate --no-interaction && php bin/console doctrine:fixtures:load --no-interaction && php -S 0.0.0.0:8001 -t public"]
+CMD ["php", "-S", "0.0.0.0:8001", "-t", "public"]
