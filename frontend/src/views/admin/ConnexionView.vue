@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { authStore } from '../../store/authStore'
 
 const router = useRouter()
 
@@ -13,22 +14,17 @@ const errorMessage = ref(null)
 
 // Simulation de connexion
 const handleLogin = async () => {
-    if (!username.value || !password.value) {
-        errorMessage.value = "Veuillez remplir tous les champs."
-        return
-    }
-
-    isLoading.value = true
     errorMessage.value = null
-
-    try {
-        console.log("Tentative de connexion pour :", username.value)
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        alert("Connexion réussie")
-    } catch (error) {
-        errorMessage.value = "Identifiants invalides."
-    } finally {
-        isLoading.value = false
+    
+    // VERIFICATION ADMIN
+    if (username.value === 'admin' && password.value === 'admin!1234') {
+        isLoading.value = true
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Simulation
+        
+        authStore.login()
+        router.push('/admin/dashboard') // Redirection vers ta page de test
+    } else {
+        errorMessage.value = "Identifiants administrateur incorrects."
     }
 }
 </script>
