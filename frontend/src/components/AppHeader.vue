@@ -86,7 +86,7 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
-              <v-list-item title="Membres réguliers" to="/membres/1" />
+              <v-list-item title="Membres réguliers" to="/membres-reguliers" />
               <v-list-item title="Membres associé.e.s" to="/membres/2" />
               <v-list-item title="Membres émérites" to="/membres/3" />
               <v-list-item title="Collaborateurs" to="/membres/4" />
