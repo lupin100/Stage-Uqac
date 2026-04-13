@@ -40,9 +40,6 @@ const breadcrumbs = computed(() => {
           </router-link>
         </div>
 
-        <v-text-field density="compact" variant="solo" placeholder="Rechercher..." hide-details
-          prepend-inner-icon="mdi-magnify" class="search-field" rounded="pill" />
-
         <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" to="/admin-connexion"> </v-btn>
       </div>
     </div>
@@ -149,11 +146,6 @@ const breadcrumbs = computed(() => {
   font-size: 1.2rem;
   font-weight: 600;
   color: white;
-}
-
-.search-field {
-  max-width: 280px;
-  min-width: 220px;
 }
 
 .gray-bar {

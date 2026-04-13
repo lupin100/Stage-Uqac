@@ -64,7 +64,7 @@ const handleLogout = () => {
 }
 
 .black-bar-content {
-  min-height: 70px; /* Un peu plus fin que le public */
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
