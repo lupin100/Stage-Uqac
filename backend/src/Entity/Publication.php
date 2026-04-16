@@ -17,7 +17,7 @@ class Publication
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['contributor:read', 'publication:read'])]
+    #[Groups(['person:read', 'contributor:read', 'publication:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: 'integer')]

@@ -73,6 +73,10 @@ class Person
     #[Groups(['person:read'])]
     private ?StudentProfile $studentProfile = null;
 
+    #[ORM\OneToOne(mappedBy: 'person', cascade: ['persist', 'remove'])]
+    #[Groups(['person:read'])]
+    private ?Contributor $contributor = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -240,6 +244,28 @@ class Person
     public function setStudentProfile(?StudentProfile $studentProfile): static
     {
         $this->studentProfile = $studentProfile;
+        return $this;
+    }
+
+    public function getContributor(): ?Contributor
+    {
+        return $this->contributor;
+    }
+
+    public function setContributor(?Contributor $contributor): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($contributor === null && $this->contributor !== null) {
+            $this->contributor->setPerson(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($contributor !== null && $contributor->getPerson() !== $this) {
+            $contributor->setPerson($this);
+        }
+
+        $this->contributor = $contributor;
+
         return $this;
     }
 }
