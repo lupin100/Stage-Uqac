@@ -125,7 +125,7 @@ class AppFixtures extends Fixture
         // --- StudentDegrees ---
         $degreeEnums = StudentDegreeEnum::cases();
         $studentDegrees = [];
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $degree = new StudentDegree();
             $startYear = $faker->numberBetween(2018, 2023);
 
@@ -139,7 +139,7 @@ class AppFixtures extends Fixture
 
         // --- StudentProfiles ---
         $studentProfiles = [];
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 40; $i++) {
             $profile = new StudentProfile();
             $profile->setSupervisor($faker->name());
             $profile->setCoSupervisor($faker->boolean(30) ? $faker->name() : null);
@@ -154,8 +154,9 @@ class AppFixtures extends Fixture
         $availableDepartements = $departements;
         $availableInstitutions = $institutions;
         $availableProfiles = $studentProfiles;
+        $persons = [];
 
-        for ($i = 0; $i < 25; $i++) {
+        for ($i = 0; $i < 150; $i++) {
             $person = new Person();
             $person->setFirstName($faker->firstName());
             $person->setLastName($faker->lastName());
@@ -179,14 +180,23 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($person);
+            $persons[] = $person;
         }
 
         // --- Contributors ---
         $contributors = [];
+        $availablePersons = $persons;
+        shuffle($availablePersons);
+
         for ($i = 0; $i < 20; $i++) {
             $contributor = new Contributor();
             $contributor->setDisplayName($faker->name());
-            $contributor->setContributorOrder($i + 1);
+
+            if (!empty($availablePersons)) {
+                $linkedPerson = array_pop($availablePersons);
+                $contributor->setPerson($linkedPerson);
+                $contributor->setDisplayName($linkedPerson->getFirstName() . ' ' . $linkedPerson->getLastName());
+            }
 
             $manager->persist($contributor);
             $contributors[] = $contributor;
