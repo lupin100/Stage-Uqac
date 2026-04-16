@@ -10,8 +10,7 @@ const breadcrumbs = computed(() => {
   const metaBreadcrumbs = route.meta?.breadcrumb || []
   
   return metaBreadcrumbs.map(item => {
-    // Si on détecte notre mot-clé magique, on remplace le titre
-    if (item.title === 'Nouvelle/:id') {
+    if (item.title === '/:id') {
       return {
         ...item,
         title: breadcrumbStore.dynamicTitle

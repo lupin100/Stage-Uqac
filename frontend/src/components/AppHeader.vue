@@ -13,7 +13,7 @@ const breadcrumbs = computed(() => {
 
   return metaBreadcrumbs.map(item => {
     // Si le titre est celui de la nouvelle dynamique
-    if (item.title === 'Nouvelle/:id') {
+    if (item.title === '/:id') {
       return {
         ...item,
         title: breadcrumbStore.dynamicTitle, // On utilise le titre du store
