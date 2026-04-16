@@ -68,9 +68,8 @@ onMounted(fetchMembers)
                 <v-col v-for="person in members" :key="person.id" cols="12" sm="6" class="mb-6">
                     <div class="d-flex align-start">
                         <router-link :to="{ name: 'membre', params: { id: person.id } }">
-                            <v-avatar size="130" rounded="0" class="mr-6 bg-grey-lighten-2 elevation-1">
-                                <v-img :src="person.photoPath || defaultAvatar" cover></v-img>
-                            </v-avatar>
+                            <v-img :src="person.photoPath || defaultAvatar" :width="150" :aspect-ratio="3 / 4" cover
+                                class="mr-6 bg-grey-lighten-2 elevation-1"></v-img>
                         </router-link>
 
                         <div>
@@ -92,17 +91,11 @@ onMounted(fetchMembers)
             </v-row>
 
             <v-row v-if="totalPages > 1" justify="center" class="mt-8">
-                <v-pagination
-                    v-model="currentPage"
-                    :length="totalPages"
-                    color="primary"
-                    rounded="rounded"
-                ></v-pagination>
+                <v-pagination v-model="currentPage" :length="totalPages" color="primary"
+                    rounded="rounded"></v-pagination>
             </v-row>
 
-            <v-empty-state v-if="members.length === 0" 
-                icon="mdi-account-off-outline" 
-                title="Aucun membre trouvé"
+            <v-empty-state v-if="members.length === 0" icon="mdi-account-off-outline" title="Aucun membre trouvé"
                 text="La base de données ne contient aucun membre régulier pour le moment.">
             </v-empty-state>
         </div>
