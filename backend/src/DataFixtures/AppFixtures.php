@@ -12,6 +12,7 @@ use App\Entity\Project;
 use App\Entity\Publication;
 use App\Entity\StudentDegree;
 use App\Entity\StudentProfile;
+use App\Entity\User;
 use App\Enum\EventEnum;
 use App\Enum\PersonEnum;
 use App\Enum\ProjectEnum;
@@ -20,16 +21,34 @@ use App\Enum\StudentDegreeEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $hasher;
+
+    public function __construct(UserPasswordHasherInterface $hasher)
+    {
+        $this->hasher = $hasher;
+    }
+
     public function load(ObjectManager $manager): void
     {
         // Init Faker french
         $faker = Factory::create('fr_FR');
 
+        // --- Administrateur ---
+        $admin = new User();
+        $admin->setEmail('admin@uqac.ca');
+        $admin->setRoles(['ROLE_ADMIN']);
+        // Hachage du mot de passe "admin123"
+        $password = $this->hasher->hashPassword($admin, 'admin123');
+        $admin->setPassword($password);
+        $manager->persist($admin);
+
+        // --- Données de génération ---
         $itSubjects = ['l\'IA', 'le Machine Learning', 'la Cybersécurité', 'l\'Algorithmique Avancée', 'le Big Data', 'l\'Informatique Quantique', 'les Réseaux de Neurones', 'la Réalité Virtuelle', 'le Cloud Computing', 'l\'IoT'];
-        
+
         $eventPrefixes = ['Conférence sur', 'Séminaire :', 'Atelier de recherche :', 'Soutenance de thèse :', 'Symposium sur'];
         $newsPrefixes = ['Nouvelle avancée pour', 'Découverte majeure en', 'Notre laboratoire prime', 'Lancement du projet sur', 'Partenariat stratégique en'];
         $pubPrefixes = ['Étude comparative sur', 'Nouvelle approche de', 'Analyse des performances pour', 'Modélisation de'];
@@ -38,11 +57,10 @@ class AppFixtures extends Fixture
         $eventEnums = EventEnum::cases();
         for ($i = 0; $i < 30; $i++) {
             $event = new Event();
-            
+
             $startDate = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6 months', '+6 months'));
             $endDate = $startDate->modify('+' . $faker->numberBetween(1, 5) . ' hours');
 
-            // Titre généré : Ex: "Séminaire : la Cybersécurité"
             $title = $faker->randomElement($eventPrefixes) . ' ' . $faker->randomElement($itSubjects);
 
             $event->setTitle($title)
@@ -50,7 +68,7 @@ class AppFixtures extends Fixture
                   ->setStartDate($startDate)
                   ->setEndDate($endDate)
                   ->setEventType($faker->randomElement($eventEnums));
-            
+
             $manager->persist($event);
         }
 
@@ -58,14 +76,13 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 30; $i++) {
             $news = new News();
 
-            // Titre généré : Ex: "Nouvelle avancée pour le Machine Learning"
             $title = $faker->randomElement($newsPrefixes) . ' ' . $faker->randomElement($itSubjects);
-            
+
             $news->setTitle($title)
                  ->setContent($faker->realText(2000))
                  ->setPublishedAt(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-2 year', 'now')))
                  ->setImagePath('https://loremflickr.com/800/600/computer,technology?lock=' . $i);
-            
+
             $manager->persist($news);
         }
 
@@ -75,7 +92,7 @@ class AppFixtures extends Fixture
             $dep = new Departement();
             $dep->setName('Département ' . $faker->word());
             $dep->setUrl($faker->optional(0.7)->url());
-            
+
             $manager->persist($dep);
             $departements[] = $dep;
         }
@@ -87,7 +104,7 @@ class AppFixtures extends Fixture
             $inst->setName('Université ' . $faker->city());
             $inst->setUrl($faker->optional(0.8)->url());
             $inst->setDepartement($faker->randomElement($departements));
-            
+
             $manager->persist($inst);
             $institutions[] = $inst;
         }
@@ -101,7 +118,7 @@ class AppFixtures extends Fixture
             $project->setFundingSource($faker->company());
             $project->setIsFinished($faker->boolean(40));
             $project->setThematic($faker->randomElement($projectEnums));
-            
+
             $manager->persist($project);
         }
 
@@ -111,11 +128,11 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 10; $i++) {
             $degree = new StudentDegree();
             $startYear = $faker->numberBetween(2018, 2023);
-            
+
             $degree->setStartYear($startYear);
             $degree->setEndYear($startYear + $faker->numberBetween(1, 3));
             $degree->setDegree($faker->randomElement($degreeEnums));
-            
+
             $manager->persist($degree);
             $studentDegrees[] = $degree;
         }
@@ -127,15 +144,13 @@ class AppFixtures extends Fixture
             $profile->setSupervisor($faker->name());
             $profile->setCoSupervisor($faker->boolean(30) ? $faker->name() : null);
             $profile->setStudentDegree($faker->randomElement($studentDegrees));
-            
+
             $manager->persist($profile);
             $studentProfiles[] = $profile;
         }
 
         // --- Persons ---
         $personEnums = PersonEnum::cases();
-        
-        // Copie des tableaux pour les relations OneToOne afin d'éviter les doublons (violation de contrainte)
         $availableDepartements = $departements;
         $availableInstitutions = $institutions;
         $availableProfiles = $studentProfiles;
@@ -152,8 +167,7 @@ class AppFixtures extends Fixture
             $person->setJobTitle($faker->jobTitle());
             $person->setPersonalPageUrl($faker->optional(0.6)->url());
             $person->setRole($faker->randomElement($personEnums));
-            
-            // Attribution OneToOne exclusive
+
             if (!empty($availableDepartements) && $faker->boolean(30)) {
                 $person->setDepartement(array_pop($availableDepartements));
             }
@@ -173,7 +187,7 @@ class AppFixtures extends Fixture
             $contributor = new Contributor();
             $contributor->setDisplayName($faker->name());
             $contributor->setContributorOrder($i + 1);
-            
+
             $manager->persist($contributor);
             $contributors[] = $contributor;
         }
@@ -182,16 +196,14 @@ class AppFixtures extends Fixture
         $publicationEnums = PublicationEnum::cases();
         for ($i = 0; $i < 20; $i++) {
             $publication = new Publication();
-
-            // Titre généré : Ex: "Étude comparative sur les Réseaux de Neurones"
             $title = $faker->randomElement($pubPrefixes) . ' ' . $faker->randomElement($itSubjects);
-            
+
             $publication->setTitle($title)
                         ->setYear($faker->numberBetween(2016, 2024))
-                        ->setExternalUrl($faker->optional(0.7)->url()) 
+                        ->setExternalUrl($faker->optional(0.7)->url())
                         ->setPublicationType($faker->randomElement($publicationEnums))
                         ->setContributor($faker->randomElement($contributors));
-            
+
             $manager->persist($publication);
         }
 
