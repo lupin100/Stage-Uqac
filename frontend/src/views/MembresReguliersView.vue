@@ -2,26 +2,30 @@
 import { ref, onMounted, computed } from 'vue'
 import defaultAvatar from '../assets/default-avatar.png'
 
-const allPersons = ref([])
+const allPersons = ref([]) // On stocke la réponse brute de l'API
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
 const fetchPersons = async () => {
     isLoading.value = true
+    errorMessage.value = null // Reset de l'erreur au début
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons`)
-        if (!response.ok) throw new Error('Erreur lors du chargement des membres')
+        
+        if (!response.ok) throw new Error('Erreur réseau')
 
         const data = await response.json()
-        allPersons.value = data
+        allPersons.value = data // On range tout le monde ici
+        
     } catch (error) {
-        errorMessage.value = "Impossible de charger la liste des membres."
+        errorMessage.value = "Impossible de charger les membres."
         console.error(error)
     } finally {
         isLoading.value = false
     }
 }
 
+// C'est ici qu'on filtre pour n'afficher que les membres réguliers
 const regularMembers = computed(() => {
     return allPersons.value.filter(person => person.role === 'Membre régulier')
 })
@@ -41,7 +45,7 @@ onMounted(fetchPersons)
             {{ errorMessage }}
         </v-alert>
 
-        <v-row v-else>
+        <v-row v-else-if="regularMembers.length > 0">
             <v-col v-for="person in regularMembers" :key="person.id" cols="12" sm="6" class="mb-6">
                 <div class="d-flex align-start">
                     <router-link :to="{ name: 'membre', params: { id: person.id } }">
@@ -66,20 +70,10 @@ onMounted(fetchPersons)
             </v-col>
         </v-row>
 
-        <v-empty-state v-if="!isLoading && regularMembers.length === 0" icon="mdi-account-off-outline"
+        <v-empty-state v-else
+            icon="mdi-account-off-outline"
             title="Aucun membre trouvé"
-            text="Il n'y a aucun membre régulier enregistré dans la base de données."></v-empty-state>
+            text="La base de données ne contient aucun membre régulier pour le moment.">
+        </v-empty-state>
     </v-container>
 </template>
-
-<style scoped>
-.color-title {
-    color: #333;
-    font-size: 2.2rem !important;
-}
-
-/* Ajustement pour l'alignement de la photo si elle est rectangulaire */
-:deep(.v-avatar .v-img__img--cover) {
-    object-position: top center;
-}
-</style>
