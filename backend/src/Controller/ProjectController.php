@@ -20,9 +20,35 @@ class ProjectController extends AbstractController
      * GET ALL : Liste tous les projets
      */
     #[Route('', name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $repository): JsonResponse
+    public function index(Request $request, ProjectRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK);
+        $page = $request->query->get('page');
+
+
+        if ($page === null) {
+            return $this->json($repository->findAll(), Response::HTTP_OK);
+        }
+
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 5)); // 5 projets par page par défaut
+        $offset = ($page - 1) * $limit;
+
+        $projects = $repository->findBy(
+            [],
+            ['id' => 'DESC'], // On affiche les plus récents en premier
+            $limit,
+            $offset
+        );
+
+        $total = $repository->count([]);
+
+        return $this->json([
+            'data'  => $projects,
+            'page'  => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'last_page' => ceil($total / $limit)
+        ]);
     }
 
     /**

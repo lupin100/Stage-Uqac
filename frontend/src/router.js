@@ -50,7 +50,7 @@ const router = createRouter({
     },
     { path: '/nouvelles/:id', name: 'nouvelle', component: NouvelleView, meta: {
       breadcrumb: [
-          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: 'Nouvelle/:id' } ] 
+          { title: 'Accueil', to: '/' }, { title: 'Nouvelles', to: '/nouvelles' }, { title: '/:id' } ] 
         }
     },
     { path: '/seminaires', name: 'seminaires', component: SeminairesView, meta: {
@@ -59,13 +59,13 @@ const router = createRouter({
         }
     },
     { path: '/seminaires/:id', name: 'seminaire', component: SeminaireView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: 'Nouvelle/:id' } ]
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Séminaires', to: '/seminaires' }, { title: '/:id' } ]
     } },
     { path: '/congres-et-ateliers', name: 'congresetateliers', component: CongresEtAteliersView, meta: {
       breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements' }, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' } ] }
     },
     { path: '/congres-et-ateliers/:id', name: 'congres-et-atelier', component: CongresEtAtelierView, meta: {
-      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: 'Nouvelle/:id' } ]
+      breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Évènements'}, { title: 'Congrès et Ateliers', to: '/congres-et-ateliers' }, { title: '/:id' } ]
     } },
     { path: '/publications', name: 'publications', component: PublicationsView, meta: {
       breadcrumb: [
@@ -85,7 +85,7 @@ const router = createRouter({
     },
     {
       path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: 'Détail du membre' } ] }
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: '/:id' } ] }
     },
     {
       path: '/admin-connexion', name: 'admin-connexion', component: ConnexionView, meta: {
