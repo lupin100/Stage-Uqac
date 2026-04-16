@@ -15,13 +15,13 @@ class StudentProfile
     #[Groups(['person:read', 'student:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Person::class, inversedBy: 'supervisedStudents')]
     #[Groups(['person:read', 'student:read'])]
-    private ?string $supervisor = null;
+    private ?Person $supervisor = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\ManyToOne(targetEntity: Person::class, inversedBy: 'coSupervisedStudents')]
     #[Groups(['person:read', 'student:read'])]
-    private ?string $coSupervisor = null;
+    private ?Person $coSupervisor = null;
 
     #[ORM\OneToOne(mappedBy: 'studentProfile', cascade: ['persist', 'remove'])]
     #[Groups(['student:read'])]
@@ -41,23 +41,23 @@ class StudentProfile
         return $this->id;
     }
 
-    public function getSupervisor(): ?string
+    public function getSupervisor(): ?Person
     {
         return $this->supervisor;
     }
 
-    public function setSupervisor(?string $supervisor): static
+    public function setSupervisor(?Person $supervisor): static
     {
         $this->supervisor = $supervisor;
         return $this;
     }
 
-    public function getCoSupervisor(): ?string
+    public function getCoSupervisor(): ?Person
     {
         return $this->coSupervisor;
     }
 
-    public function setCoSupervisor(?string $coSupervisor): static
+    public function setCoSupervisor(?Person $coSupervisor): static
     {
         $this->coSupervisor = $coSupervisor;
         return $this;

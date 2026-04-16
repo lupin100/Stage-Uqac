@@ -122,6 +122,47 @@ class AppFixtures extends Fixture
             $manager->persist($project);
         }
 
+        // --- Persons ---
+        $personEnums = PersonEnum::cases();
+        $availableDepartements = $departements;
+        $availableInstitutions = $institutions;
+        $persons = [];
+        $students = [];
+        $members = [];
+
+        for ($i = 0; $i < 150; $i++) {
+            $person = new Person();
+            $person->setFirstName($faker->firstName());
+            $person->setLastName($faker->lastName());
+            $person->setEmail($faker->unique()->safeEmail());
+            $person->setBiography($faker->realText(1000));
+            $person->setIsActive($faker->boolean(80));
+            $person->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-3 years', '-1 year')));
+            $person->setUpdatedAt(new \DateTimeImmutable());
+            $person->setJobTitle($faker->jobTitle());
+            $person->setPersonalPageUrl($faker->optional(0.6)->url());
+
+            $role = $faker->randomElement($personEnums);
+            $person->setRole($role);
+
+            if (!empty($availableDepartements) && $faker->boolean(30)) {
+                $person->setDepartement(array_pop($availableDepartements));
+            }
+            if (!empty($availableInstitutions) && $faker->boolean(30)) {
+                $person->setInstitution(array_pop($availableInstitutions));
+            }
+
+            $manager->persist($person);
+            $persons[] = $person;
+
+            // tri pour récuper les étudiants et les membres pour les fixtures suivantes
+            if (in_array($role, [PersonEnum::ETUDIANT, PersonEnum::ANCIEN_ETUDIANT], true)) {
+                $students[] = $person;
+            } elseif (in_array($role, [PersonEnum::MEMBRE_REGULIER, PersonEnum::MEMBRE_REGULIER_COMMITE, PersonEnum::MEMBRE_ASSOCIE, PersonEnum::MEMBRE_EMERITE], true)) {
+                $members[] = $person;
+            }
+        }
+
         // --- StudentDegrees ---
         $degreeEnums = StudentDegreeEnum::cases();
         $studentDegrees = [];
@@ -139,49 +180,30 @@ class AppFixtures extends Fixture
 
         // --- StudentProfiles ---
         $studentProfiles = [];
-        for ($i = 0; $i < 40; $i++) {
+        $availableStudents = $students;
+        shuffle($availableStudents);
+
+        // on s'assure de ne pas dépasser le nombre d'étudiants disponibles pour éviter les erreurs de fixtures
+        $numberOfProfiles = min(40, count($students));
+
+        for ($i = 0; $i < $numberOfProfiles; $i++) {
             $profile = new StudentProfile();
-            $profile->setSupervisor($faker->name());
-            $profile->setCoSupervisor($faker->boolean(30) ? $faker->name() : null);
+            
+            // Les superviseurs sont piochés UNIQUEMENT parmi les membres
+            if (!empty($members)) {
+                $profile->setSupervisor($faker->randomElement($members));
+                $profile->setCoSupervisor($faker->boolean(30) ? $faker->randomElement($members) : null);
+            }
+            
             $profile->setStudentDegree($faker->randomElement($studentDegrees));
             $profile->setTopic('Recherche sur ' . $faker->catchPhrase());
 
+            // Le profil est assigné UNIQUEMENT à un étudiant
+            $student = array_pop($students);
+            $student->setStudentProfile($profile);
+
             $manager->persist($profile);
             $studentProfiles[] = $profile;
-        }
-
-        // --- Persons ---
-        $personEnums = PersonEnum::cases();
-        $availableDepartements = $departements;
-        $availableInstitutions = $institutions;
-        $availableProfiles = $studentProfiles;
-        $persons = [];
-
-        for ($i = 0; $i < 150; $i++) {
-            $person = new Person();
-            $person->setFirstName($faker->firstName());
-            $person->setLastName($faker->lastName());
-            $person->setEmail($faker->unique()->safeEmail());
-            $person->setBiography($faker->realText(1000));
-            $person->setIsActive($faker->boolean(80));
-            $person->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-3 years', '-1 year')));
-            $person->setUpdatedAt(new \DateTimeImmutable());
-            $person->setJobTitle($faker->jobTitle());
-            $person->setPersonalPageUrl($faker->optional(0.6)->url());
-            $person->setRole($faker->randomElement($personEnums));
-
-            if (!empty($availableDepartements) && $faker->boolean(30)) {
-                $person->setDepartement(array_pop($availableDepartements));
-            }
-            if (!empty($availableInstitutions) && $faker->boolean(30)) {
-                $person->setInstitution(array_pop($availableInstitutions));
-            }
-            if (!empty($availableProfiles) && $faker->boolean(50)) {
-                $person->setStudentProfile(array_pop($availableProfiles));
-            }
-
-            $manager->persist($person);
-            $persons[] = $person;
         }
 
         // --- Contributors ---

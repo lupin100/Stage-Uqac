@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Enum\PersonEnum;
 use App\Repository\PersonRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
@@ -77,10 +79,20 @@ class Person
     #[Groups(['person:read'])]
     private ?Contributor $contributor = null;
 
+    #[ORM\OneToMany(mappedBy: 'supervisor', targetEntity: StudentProfile::class)]
+    #[Groups(['person:read'])] // Pour voir les étudiants depuis le profil du prof
+    private Collection $supervisedStudents;
+
+    #[ORM\OneToMany(mappedBy: 'coSupervisor', targetEntity: StudentProfile::class)]
+    #[Groups(['person:read'])]
+    private Collection $coSupervisedStudents;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->supervisedStudents = new ArrayCollection();
+        $this->coSupervisedStudents = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -266,6 +278,60 @@ class Person
 
         $this->contributor = $contributor;
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, StudentProfile>
+     */
+    public function getSupervisedStudents(): Collection
+    {
+        return $this->supervisedStudents;
+    }
+
+    public function addSupervisedStudent(StudentProfile $studentProfile): static
+    {
+        if (!$this->supervisedStudents->contains($studentProfile)) {
+            $this->supervisedStudents->add($studentProfile);
+            $studentProfile->setSupervisor($this);
+        }
+        return $this;
+    }
+
+    public function removeSupervisedStudent(StudentProfile $studentProfile): static
+    {
+        if ($this->supervisedStudents->removeElement($studentProfile)) {
+            if ($studentProfile->getSupervisor() === $this) {
+                $studentProfile->setSupervisor(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, StudentProfile>
+     */
+    public function getCoSupervisedStudents(): Collection
+    {
+        return $this->coSupervisedStudents;
+    }
+
+    public function addCoSupervisedStudent(StudentProfile $studentProfile): static
+    {
+        if (!$this->coSupervisedStudents->contains($studentProfile)) {
+            $this->coSupervisedStudents->add($studentProfile);
+            $studentProfile->setCoSupervisor($this);
+        }
+        return $this;
+    }
+
+    public function removeCoSupervisedStudent(StudentProfile $studentProfile): static
+    {
+        if ($this->coSupervisedStudents->removeElement($studentProfile)) {
+            if ($studentProfile->getCoSupervisor() === $this) {
+                $studentProfile->setCoSupervisor(null);
+            }
+        }
         return $this;
     }
 }
