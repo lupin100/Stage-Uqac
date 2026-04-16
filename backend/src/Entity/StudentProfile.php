@@ -16,11 +16,13 @@ class StudentProfile
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Person::class, inversedBy: 'supervisedStudents')]
-    #[Groups([ 'student:read'])]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['student:read'])]
     private ?Person $supervisor = null;
 
     #[ORM\ManyToOne(targetEntity: Person::class, inversedBy: 'coSupervisedStudents')]
-    #[Groups([ 'student:read'])]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['student:read'])]
     private ?Person $coSupervisor = null;
 
     #[ORM\OneToOne(mappedBy: 'studentProfile', cascade: ['persist', 'remove'])]

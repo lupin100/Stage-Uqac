@@ -72,6 +72,7 @@ class Person
     private ?Departement $departement = null;
 
     #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     #[Groups(['person:read'])]
     private ?StudentProfile $studentProfile = null;
 

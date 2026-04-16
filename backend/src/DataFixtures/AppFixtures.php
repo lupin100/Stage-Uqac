@@ -240,6 +240,12 @@ class AppFixtures extends Fixture
             $manager->persist($publication);
         }
 
+        // USER DE TEST
+        $testUser = new User();
+        $testUser->setEmail('test');
+        $testUser->setPassword('test');
+        $manager->persist($testUser);
+
         $manager->flush();
     }
 }
