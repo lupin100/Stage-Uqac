@@ -144,6 +144,7 @@ class AppFixtures extends Fixture
             $profile->setSupervisor($faker->name());
             $profile->setCoSupervisor($faker->boolean(30) ? $faker->name() : null);
             $profile->setStudentDegree($faker->randomElement($studentDegrees));
+            $profile->setTopic('Recherche sur ' . $faker->catchPhrase());
 
             $manager->persist($profile);
             $studentProfiles[] = $profile;

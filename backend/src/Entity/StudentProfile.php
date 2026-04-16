@@ -32,6 +32,10 @@ class StudentProfile
     #[Groups(['person:read', 'student:read'])]
     private ?StudentDegree $studentDegree = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['person:read', 'student:read'])]
+    private ?string $topic = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +90,18 @@ class StudentProfile
     public function setStudentDegree(?StudentDegree $studentDegree): static
     {
         $this->studentDegree = $studentDegree;
+        return $this;
+    }
+
+    public function getTopic(): ?string
+    {
+        return $this->topic;
+    }
+
+    public function setTopic(?string $topic): static
+    {
+        $this->topic = $topic;
+
         return $this;
     }
 }
