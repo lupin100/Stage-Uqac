@@ -105,6 +105,7 @@ onMounted(fetchProjects)
                 <v-pagination
                     v-model="currentPage"
                     :length="totalPages"
+                    :total-visible="3"
                     color="primary"
                     rounded="rounded"
                 ></v-pagination>

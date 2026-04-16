@@ -20,13 +20,41 @@ class PersonController extends AbstractController
      * GET ALL : Liste toutes les personnes avec leurs relations
      */
     #[Route('', name: 'app_person_index', methods: ['GET'])]
-    public function index(PersonRepository $repository): JsonResponse
+    public function index(Request $request, PersonRepository $repository): JsonResponse
     {
-        $persons = $repository->findBy([], ['lastName' => 'ASC']);
+        $page = $request->query->get('page');
+        $role = $request->query->get('role'); // On récupère le rôle s'il est fourni
 
-        return $this->json($persons, Response::HTTP_OK, [], [
-            'groups' => 'person:read'
-        ]);
+        $criteria = [];
+        if ($role) {
+            $criteria['role'] = $role;
+        }
+
+        if ($page === null) {
+            $persons = $repository->findBy($criteria, ['lastName' => 'ASC']);
+            return $this->json($persons, Response::HTTP_OK, [], ['groups' => 'person:read']);
+        }
+
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 6));
+        $offset = ($page - 1) * $limit;
+
+        $persons = $repository->findBy(
+            $criteria,
+            ['lastName' => 'ASC'],
+            $limit,
+            $offset
+        );
+
+        $total = $repository->count($criteria);
+
+        return $this->json([
+            'data' => $persons,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'last_page' => ceil($total / $limit)
+        ], Response::HTTP_OK, [], ['groups' => 'person:read']);
     }
 
     /**
