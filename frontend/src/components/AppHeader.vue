@@ -76,7 +76,7 @@ const breadcrumbs = computed(() => {
               <v-list-item title="Mission" to="/mission" />
               <v-list-item title="Valeurs" to="/valeurs" />
               <v-list-item title="Comités scientifique et exécutif" to="/laboratoires/4" />
-              <v-list-item title="Conseil stratégique" to="/laboratoires/5" />
+              <v-list-item title="Conseil stratégique" to="/conseil-strategique" />
             </v-list>
           </v-menu>
         </v-tab>

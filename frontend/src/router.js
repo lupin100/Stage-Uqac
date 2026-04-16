@@ -18,6 +18,7 @@ import MembresReguliersView from './views/MembresReguliersView.vue'
 import MembreCollaboView from './views/MembreCollaboView.vue'
 import ConnexionView from './views/admin/ConnexionView.vue'
 import DashboardView from './views/admin/DashboardView.vue'
+import ConseilStrategiqueView from './views/ConseilStrategiqueView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -33,6 +34,10 @@ const router = createRouter({
     { path: '/valeurs', name: 'valeurs', component: ValeursView, meta: {
       breadcrumb: [
           { title: 'Accueil', to: '/' }, { title: 'Laboratoires' }, { title: 'Valeurs', to: '/valeurs' } ] } 
+    },
+    {
+      path: '/conseil-strategique', name: 'conseil-strategique', component: ConseilStrategiqueView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Laboratoires' }, { title: 'Conseil stratégique', to: '/conseil-strategique' } ] }  
     },
     { path: '/thematiques', name: 'thematiques', component: ThematiquesView, meta: {
       breadcrumb: [
