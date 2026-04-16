@@ -199,7 +199,7 @@ class AppFixtures extends Fixture
             $profile->setTopic('Recherche sur ' . $faker->catchPhrase());
 
             // Le profil est assigné UNIQUEMENT à un étudiant
-            $student = array_pop($students);
+            $student = array_pop($availableStudents);
             $student->setStudentProfile($profile);
 
             $manager->persist($profile);
