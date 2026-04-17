@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Repository\PublicationRepository;
 
 #[Route('/api/persons')]
 class PersonController extends AbstractController
@@ -113,7 +114,7 @@ class PersonController extends AbstractController
     public function getSupervisedStudents(int $id, PersonRepository $personRepository): JsonResponse
     {
         $supervisor = $personRepository->find($id);
-        
+
         if (!$supervisor) {
             return $this->json(['error' => 'Membre introuvable'], 404);
         }
@@ -121,6 +122,19 @@ class PersonController extends AbstractController
         $students = $personRepository->findStudentsBySupervisor($id);
 
         return $this->json($students);
+    }
+
+    #[Route('/{id}/publications', methods: ['GET'])]
+    public function getPersonPublications(int $id, PublicationRepository $pubRepo): JsonResponse
+    {
+        $publications = $pubRepo->findByPerson($id);
+
+        return $this->json($publications, 200, [], [
+            'groups' => ['publication:read'],
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            },
+        ]);
     }
 
     /**

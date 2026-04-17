@@ -20,7 +20,7 @@ class PublicationRepository extends ServiceEntityRepository
     public function findPublicationsByFilters(?int $year, ?string $type, ?string $search, ?int $limit = null, ?int $offset = null): Paginator
     {
         $qb = $this->createQueryBuilder('p')
-        ->leftJoin('p.contributors', 'c')
+            ->leftJoin('p.contributors', 'c')
             ->addSelect('c')
             ->leftJoin('c.person', 'pers')
             ->addSelect('pers')
@@ -28,27 +28,29 @@ class PublicationRepository extends ServiceEntityRepository
 
         if ($year) {
             $qb->andWhere('p.year = :year')
-               ->setParameter('year', $year);
+                ->setParameter('year', $year);
         }
 
         if ($type && $type !== 'all') {
             $qb->andWhere('p.publicationType = :type')
-               ->setParameter('type', $type);
+                ->setParameter('type', $type);
         }
 
         if ($search) {
             $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
-               ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
-               ->setParameter('searchQuery', $search)
-               ->setParameter('likeQuery', '%'.$search.'%')
-               ->orderBy('score', 'ASC');
+                ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
+                ->setParameter('searchQuery', $search)
+                ->setParameter('likeQuery', '%' . $search . '%')
+                ->orderBy('score', 'ASC');
         } else {
             $qb->orderBy('p.year', 'DESC')
-               ->addOrderBy('p.id', 'DESC');
+                ->addOrderBy('p.id', 'DESC');
         }
 
-        if ($limit) $qb->setMaxResults($limit);
-        if ($offset) $qb->setFirstResult($offset);
+        if ($limit)
+            $qb->setMaxResults($limit);
+        if ($offset)
+            $qb->setFirstResult($offset);
 
         $query = $qb->getQuery();
 
@@ -71,14 +73,14 @@ class PublicationRepository extends ServiceEntityRepository
 
         if ($search) {
             $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
-               ->setParameter('searchQuery', $search)
-               ->setParameter('likeQuery', '%'.$search.'%');
+                ->setParameter('searchQuery', $search)
+                ->setParameter('likeQuery', '%' . $search . '%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-        public function findDistinctYears(): array
+    public function findDistinctYears(): array
     {
         return $this->createQueryBuilder('p')
             ->select('DISTINCT p.year')
@@ -94,6 +96,21 @@ class PublicationRepository extends ServiceEntityRepository
             ->select('DISTINCT p.publicationType')
             ->where('p.publicationType IS NOT NULL')
             ->orderBy('p.publicationType', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByPerson(int $personId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.contributors', 'c')
+            ->join('c.person', 'pers')
+            ->leftJoin('p.contributors', 'all_c')
+            ->leftJoin('all_c.person', 'all_p')
+            ->addSelect('all_c', 'all_p')
+            ->where('pers.id = :id')
+            ->setParameter('id', $personId)
+            ->orderBy('p.year', 'DESC')
             ->getQuery()
             ->getResult();
     }

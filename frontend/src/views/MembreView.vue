@@ -59,7 +59,27 @@ const fetchPersonDetail = async () => {
   }
 }
 
-onMounted(fetchPersonDetail)
+const publications = ref([])
+
+const pubHeaders = [
+  { title: 'Titre', key: 'title' },
+  { title: 'Type', key: 'type' },
+  { title: 'Année', key: 'year' },
+  { title: 'Lien', key: 'url', sortable: false },
+]
+
+const fetchMemberPublications = async () => {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/${route.params.id}/publications`)
+  if (res.ok) {
+    publications.value = await res.json()
+  }
+}
+
+onMounted(() => {
+  fetchMemberPublications(),
+    fetchPersonDetail()
+})
+
 </script>
 
 <template>
@@ -179,6 +199,67 @@ onMounted(fetchPersonDetail)
           </div>
         </div>
         <v-expansion-panels class="mt-6" variant="separated" multiple>
+          <v-expansion-panel v-if="publications.length > 0" class="mt-4">
+            <v-expansion-panel-title class="text-h6 font-weight-bold">
+              Publications
+            </v-expansion-panel-title>
+
+            <v-expansion-panel-text>
+              <v-row>
+
+                <v-col v-for="pub in publications" :key="pub.id" cols="12">
+                  <v-card variant="outlined" class="mb-2 border-sm hover-shadow transition-swing">
+                    <v-row no-gutters align="center">
+
+                      <v-col cols="12" md="2" class="pa-4 text-center border-md-right">
+                        <div class="text-h6 font-weight-bold text-primary no-wrap-year">
+                          {{ pub.year }}
+                        </div>
+                      </v-col>
+
+                      <v-col cols="12" md="7" class="pa-4">
+                        <div class="mb-2">
+                          <v-chip variant="tonal" color="primary" size="small" class="px-2 font-weight-bold">
+                            {{ pub.publicationType }}
+                          </v-chip>
+                        </div>
+
+                        <v-card-title class="text-h6 font-weight-bold px-0 pt-0 text-wrap leading-tight">
+                          {{ pub.title }}
+                        </v-card-title>
+
+                        <v-card-subtitle class="px-0 text-body-1 italic text-grey-darken-2">
+                          <template v-if="pub.contributors?.length > 0">
+                            <span v-for="(contributor, index) in pub.contributors" :key="contributor.id">
+                              <router-link v-if="contributor.person"
+                                :to="{ name: 'membre', params: { id: contributor.person.id } }"
+                                class="text-black text-decoration-none author-link font-weight-medium">
+                                {{ contributor.person.firstName }} {{ contributor.person.lastName }}
+                              </router-link>
+                              <span v-else class="text-black">{{ contributor.displayName }}</span>
+                              <span v-if="index < pub.contributors.length - 1" class="mr-1">, </span>
+                            </span>
+                          </template>
+                        </v-card-subtitle>
+                      </v-col>
+
+                      <v-col cols="12" md="3" class="pa-4 text-md-right text-center">
+                        <v-btn v-if="pub.externalUrl" :href="pub.externalUrl" target="_blank" variant="flat"
+                          color="primary" size="small" prepend-icon="mdi-open-in-new" rounded="pill">
+                          Consulter
+                        </v-btn>
+                        <v-chip v-else size="small" variant="text" color="grey">
+                          <v-icon start size="16">mdi-link-off</v-icon>
+                          Lien non disponible
+                        </v-chip>
+                      </v-col>
+
+                    </v-row>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
           <v-expansion-panel v-if="currentStudents.length > 0">
             <v-expansion-panel-title class="text-h6 font-weight-bold">
@@ -195,7 +276,7 @@ onMounted(fetchPersonDetail)
 
                 <template #item.degree="{ item }">
                   {{ item.degree }} <span v-if="item.startYear" class="text-grey text-caption">(Depuis {{ item.startYear
-                    }})</span>
+                  }})</span>
                 </template>
               </TableComponent>
             </v-expansion-panel-text>
@@ -235,5 +316,24 @@ onMounted(fetchPersonDetail)
 
 .rounded {
   border: 1px solid #e0e0e0;
+}
+
+.leading-tight {
+  line-height: 1.25 !important;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgb(var(--v-theme-primary)) !important;
+  cursor: default;
+}
+
+.transition-swing {
+  transition: all 0.2s ease-in-out;
+}
+
+.author-link:hover {
+  color: rgb(var(--v-theme-primary)) !important;
+  text-decoration: underline !important;
 }
 </style>
