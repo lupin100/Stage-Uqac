@@ -17,12 +17,43 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProjectController extends AbstractController
 {
     /**
-     * GET ALL : Liste tous les projets
+     * GET ALL : Liste tous les projets filtrés avec leurs contributeurs
      */
     #[Route('', name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $repository): JsonResponse
+    public function index(Request $request, ProjectRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK);
+        $status = $request->query->get('status');
+        $thematic = $request->query->get('thematic');
+        $search = $request->query->get('q');
+
+        $page = $request->query->get('page');
+        $limit = (int) $request->query->get('limit', 5);
+
+        $context = ['groups' => 'project:read'];
+
+        if ($page === null) {
+            $projects = $repository->findProjectsByFilters($status, $search, $thematic);
+            return $this->json($projects, Response::HTTP_OK, [], $context);
+        }
+
+        $page = max(1, (int) $page);
+        $offset = ($page - 1) * $limit;
+
+        $projects = $repository->findProjectsByFilters($status, $search, $thematic, $limit, $offset);
+        $total = $repository->countProjectsByFilters($status, $search, $thematic);
+
+        return $this->json([
+            'data'  => $projects,
+            'total' => $total,
+            'page'  => $page,
+            'limit' => $limit,
+            'last_page' => ceil($total / $limit),
+            'filters' => [
+                'status' => $status,
+                'thematic' => $thematic,
+                'search' => $search
+            ]
+        ], Response::HTTP_OK, [], $context);
     }
 
     /**
@@ -30,8 +61,8 @@ class ProjectController extends AbstractController
      */
     #[Route('', name: 'app_project_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -46,19 +77,19 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
 
-            return $this->json($project, Response::HTTP_CREATED);
+            return $this->json($project, Response::HTTP_CREATED, [], ['groups' => 'project:read']);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
         }
     }
 
     /**
-     * GET ONE : Détails d'un projet
+     * GET ONE : Détails d'un projet spécifique
      */
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): JsonResponse
     {
-        return $this->json($project, Response::HTTP_OK);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project:read']);
     }
 
     /**
@@ -66,21 +97,21 @@ class ProjectController extends AbstractController
      */
     #[Route('/{id}', name: 'app_project_update', methods: ['PATCH'])]
     public function update(
-        Project $project, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Project $project,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Project::class, 
-            'json', 
+            $request->getContent(),
+            Project::class,
+            'json',
             ['object_to_populate' => $project]
         );
 
         $em->flush();
 
-        return $this->json($project, Response::HTTP_OK);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project:read']);
     }
 
     /**

@@ -17,12 +17,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class StudentDegreeController extends AbstractController
 {
     /**
-     * GET ALL : Liste tous les diplômes/parcours étudiants
+     * GET ALL : Liste tous les diplômes
      */
     #[Route('', name: 'app_student_degree_index', methods: ['GET'])]
     public function index(StudentDegreeRepository $repository): JsonResponse
     {
-        return $this->json($repository->findBy([], ['startYear' => 'DESC']), Response::HTTP_OK);
+        $degrees = $repository->findBy([], ['startYear' => 'DESC']);
+
+        return $this->json($degrees, Response::HTTP_OK, [], [
+            'groups' => 'degree:read'
+        ]);
     }
 
     /**
@@ -30,8 +34,8 @@ class StudentDegreeController extends AbstractController
      */
     #[Route('', name: 'app_student_degree_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -46,7 +50,9 @@ class StudentDegreeController extends AbstractController
             $em->persist($studentDegree);
             $em->flush();
 
-            return $this->json($studentDegree, Response::HTTP_CREATED);
+            return $this->json($studentDegree, Response::HTTP_CREATED, [], [
+                'groups' => 'degree:read'
+            ]);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Données invalides ou type de diplôme inconnu'], Response::HTTP_BAD_REQUEST);
         }
@@ -58,7 +64,9 @@ class StudentDegreeController extends AbstractController
     #[Route('/{id}', name: 'app_student_degree_show', methods: ['GET'])]
     public function show(StudentDegree $studentDegree): JsonResponse
     {
-        return $this->json($studentDegree, Response::HTTP_OK);
+        return $this->json($studentDegree, Response::HTTP_OK, [], [
+            'groups' => 'degree:read'
+        ]);
     }
 
     /**
@@ -66,21 +74,23 @@ class StudentDegreeController extends AbstractController
      */
     #[Route('/{id}', name: 'app_student_degree_update', methods: ['PATCH'])]
     public function update(
-        StudentDegree $studentDegree, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        StudentDegree $studentDegree,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            StudentDegree::class, 
-            'json', 
+            $request->getContent(),
+            StudentDegree::class,
+            'json',
             ['object_to_populate' => $studentDegree]
         );
 
         $em->flush();
 
-        return $this->json($studentDegree, Response::HTTP_OK);
+        return $this->json($studentDegree, Response::HTTP_OK, [], [
+            'groups' => 'degree:read'
+        ]);
     }
 
     /**
@@ -92,6 +102,6 @@ class StudentDegreeController extends AbstractController
         $em->remove($studentDegree);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_OK);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

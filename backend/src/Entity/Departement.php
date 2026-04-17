@@ -6,6 +6,7 @@ use App\Repository\DepartementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
 #[ORM\Entity(repositoryClass: DepartementRepository::class)]
 class Departement
@@ -13,26 +14,36 @@ class Departement
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['person:read', 'departement:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['person:read', 'departement:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['person:read', 'departement:read'])]
     private ?string $url = null;
 
-    #[ORM\OneToOne(mappedBy: 'departement', cascade: ['persist', 'remove'])]
-    private ?Person $person = null;
 
     /**
      * @var Collection<int, Institution>
      */
     #[ORM\OneToMany(targetEntity: Institution::class, mappedBy: 'departement')]
+    #[Groups(['departement:read'])]
     private Collection $institution;
+
+    /**
+     * @var Collection<int, Person>
+     */
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'departements')]
+    #[Groups(['departement:read'])]
+    private Collection $persons;
 
     public function __construct()
     {
         $this->institution = new ArrayCollection();
+        $this->persons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -48,7 +59,6 @@ class Departement
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -60,31 +70,10 @@ class Departement
     public function setUrl(?string $url): static
     {
         $this->url = $url;
-
         return $this;
     }
 
-    public function getPerson(): ?Person
-    {
-        return $this->person;
-    }
 
-    public function setPerson(?Person $person): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($person === null && $this->person !== null) {
-            $this->person->setDepartement(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($person !== null && $person->getDepartement() !== $this) {
-            $person->setDepartement($this);
-        }
-
-        $this->person = $person;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Institution>
@@ -107,7 +96,6 @@ class Departement
     public function removeInstitution(Institution $institution): static
     {
         if ($this->institution->removeElement($institution)) {
-            // set the owning side to null (unless already changed)
             if ($institution->getDepartement() === $this) {
                 $institution->setDepartement(null);
             }
@@ -116,5 +104,30 @@ class Departement
         return $this;
     }
 
+    /**
+     * @return Collection<int, Person>
+     */
+    public function getPersons(): Collection
+    {
+        return $this->persons;
+    }
 
+    public function addPerson(Person $person): static
+    {
+        if (!$this->persons->contains($person)) {
+            $this->persons->add($person);
+            $person->addDepartement($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerson(Person $person): static
+    {
+        if ($this->persons->removeElement($person)) {
+            $person->removeDepartement($this);
+        }
+
+        return $this;
+    }
 }

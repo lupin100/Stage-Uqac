@@ -3,11 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ContributorRepository;
-use BcMath\Number;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
 #[ORM\Entity(repositoryClass: ContributorRepository::class)]
 class Contributor
@@ -15,40 +14,42 @@ class Contributor
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['contributor:read', 'publication:read','project:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $contributorOrder = null;
-
     #[ORM\Column(length: 255)]
+    #[Groups(['contributor:read', 'publication:read','project:read'])]
     private ?string $displayName = null;
+
+
+
+    #[ORM\OneToOne(inversedBy: 'contributor', cascade: ['persist', 'remove'])]
+    #[Groups(['publication:read', 'contributor:read','project:read'])]
+    private ?Person $person = null;
 
     /**
      * @var Collection<int, Publication>
      */
-    #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'contributor')]
+    #[ORM\ManyToMany(targetEntity: Publication::class, inversedBy: 'contributors')]
+    #[Groups(['contributor:read'])]
     private Collection $publications;
+
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'contributors')]
+    #[Groups(['contributor:read'])]
+    private Collection $projects;
 
     public function __construct()
     {
         $this->publications = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getContributorOrder(): ?int
-    {
-        return $this->contributorOrder;
-    }
-
-    public function setContributorOrder(int $contributorOrder): static
-    {
-        $this->contributorOrder = $contributorOrder;
-
-        return $this;
     }
 
     public function getDisplayName(): ?string
@@ -59,6 +60,19 @@ class Contributor
     public function setDisplayName(string $displayName): static
     {
         $this->displayName = $displayName;
+        return $this;
+    }
+
+
+
+    public function getPerson(): ?Person
+    {
+        return $this->person;
+    }
+
+    public function setPerson(?Person $person): static
+    {
+        $this->person = $person;
 
         return $this;
     }
@@ -75,7 +89,6 @@ class Contributor
     {
         if (!$this->publications->contains($publication)) {
             $this->publications->add($publication);
-            $publication->setContributor($this);
         }
 
         return $this;
@@ -83,12 +96,31 @@ class Contributor
 
     public function removePublication(Publication $publication): static
     {
-        if ($this->publications->removeElement($publication)) {
-            // set the owning side to null (unless already changed)
-            if ($publication->getContributor() === $this) {
-                $publication->setContributor(null);
-            }
+        $this->publications->removeElement($publication);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
         }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        $this->projects->removeElement($project);
 
         return $this;
     }

@@ -16,16 +16,24 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api/student-profiles')]
 class StudentProfileController extends AbstractController
 {
+    /**
+     * GET ALL
+     */
     #[Route('', name: 'app_student_profile_index', methods: ['GET'])]
     public function index(StudentProfileRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK);
+        return $this->json($repository->findAll(), Response::HTTP_OK, [], [
+            'groups' => 'student:read'
+        ]);
     }
 
+    /**
+     * POST
+     */
     #[Route('', name: 'app_student_profile_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -39,40 +47,55 @@ class StudentProfileController extends AbstractController
         $em->persist($profile);
         $em->flush();
 
-        return $this->json($profile, Response::HTTP_CREATED);
+        return $this->json($profile, Response::HTTP_CREATED, [], [
+            'groups' => 'student:read'
+        ]);
     }
 
+    /**
+     * GET ONE
+     */
     #[Route('/{id}', name: 'app_student_profile_show', methods: ['GET'])]
     public function show(StudentProfile $profile): JsonResponse
     {
-        return $this->json($profile, Response::HTTP_OK);
+        return $this->json($profile, Response::HTTP_OK, [], [
+            'groups' => 'student:read'
+        ]);
     }
 
+    /**
+     * PATCH
+     */
     #[Route('/{id}', name: 'app_student_profile_update', methods: ['PATCH'])]
     public function update(
-        StudentProfile $profile, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        StudentProfile $profile,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            StudentProfile::class, 
-            'json', 
+            $request->getContent(),
+            StudentProfile::class,
+            'json',
             ['object_to_populate' => $profile]
         );
 
         $em->flush();
 
-        return $this->json($profile, Response::HTTP_OK);
+        return $this->json($profile, Response::HTTP_OK, [], [
+            'groups' => 'student:read'
+        ]);
     }
 
+    /**
+     * DELETE
+     */
     #[Route('/{id}', name: 'app_student_profile_delete', methods: ['DELETE'])]
     public function delete(StudentProfile $profile, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($profile);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_OK);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

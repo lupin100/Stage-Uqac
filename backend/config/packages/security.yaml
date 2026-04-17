@@ -1,39 +1,78 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    # 1. Configuration du hachage des mots de passe
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    # 2. Source des utilisateurs
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
 
     firewalls:
+        # Firewall pour les outils de dev (Profiler, WDT)
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        main:
+
+        # Firewall pour l'administration (EasyAdmin)
+        admin:
+            pattern: ^/admin
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            
+            custom_authenticator: App\Security\AdminAuthenticator
+            entry_point: App\Security\AdminAuthenticator
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+            logout:
+                path: app_logout
+                target: app_login
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # by default, the feature is enabled by checking a checkbox in the
+                # login form, uncomment the following line to always enable it.
+                #always_remember_me: true
 
-    # Note: Only the *first* matching rule is applied
+        # Firewall spécifique pour la ROUTE DE LOGIN (récupération du token)
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # Firewall principal pour TOUTE l'API (protection par token)
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+    # 3. Contrôle d'accès (Qui peut aller où)
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # 1. La route de login doit toujours être publique
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
 
+        # 2. On autorise le GET (lecture) sur toute l'API pour tout le monde
+        - { path: ^/api, methods: [GET], roles: PUBLIC_ACCESS }
+
+        # 3. Toutes les autres méthodes (POST, PATCH, DELETE, PUT) exigent le rôle ADMIN
+        # Note : IS_AUTHENTICATED_FULLY vérifie que l'utilisateur est loggé via JWT
+        - { path: ^/api, roles: ROLE_ADMIN }
+
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+
+# Configuration spécifique aux tests (vitesse de hachage)
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

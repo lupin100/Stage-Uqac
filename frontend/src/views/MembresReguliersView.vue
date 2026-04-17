@@ -1,32 +1,47 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import defaultAvatar from '../assets/default-avatar.png'
 
-const allPersons = ref([])
+const members = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
-const fetchPersons = async () => {
+const fetchMembers = async () => {
     isLoading.value = true
+    errorMessage.value = null
+    
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons`)
-        if (!response.ok) throw new Error('Erreur lors du chargement des membres')
+        // Préparation des URLs
+        const urlRegulier = `${import.meta.env.VITE_API_URL}/api/persons/filter/${encodeURIComponent('Membre régulier')}`
+        const urlComite = `${import.meta.env.VITE_API_URL}/api/persons/filter/${encodeURIComponent('Membre régulier du comité exécutif')}`
 
-        const data = await response.json()
-        allPersons.value = data
+        // On lance les deux requêtes en parallèle pour gagner du temps
+        const [resReguliers, resComite] = await Promise.all([
+            fetch(urlRegulier),
+            fetch(urlComite)
+        ])
+
+        if (!resReguliers.ok || !resComite.ok) throw new Error('Erreur lors de la récupération des données')
+
+        const dataReguliers = await resReguliers.json()
+        const dataComite = await resComite.json()
+
+        // Extraction des tableaux (gestion du format { data: [] } ou directement [])
+        const list1 = Array.isArray(dataReguliers) ? dataReguliers : (dataReguliers.data || [])
+        const list2 = Array.isArray(dataComite) ? dataComite : (dataComite.data || [])
+
+        // On fusionne les deux listes
+        members.value = [...list1, ...list2]
+
     } catch (error) {
-        errorMessage.value = "Impossible de charger la liste des membres."
+        errorMessage.value = "Impossible de charger les membres."
         console.error(error)
     } finally {
         isLoading.value = false
     }
 }
 
-const regularMembers = computed(() => {
-    return allPersons.value.filter(person => person.role === 'Membre régulier')
-})
-
-onMounted(fetchPersons)
+onMounted(fetchMembers)
 </script>
 
 <template>
@@ -41,45 +56,36 @@ onMounted(fetchPersons)
             {{ errorMessage }}
         </v-alert>
 
-        <v-row v-else>
-            <v-col v-for="person in regularMembers" :key="person.id" cols="12" sm="6" class="mb-6">
-                <div class="d-flex align-start">
-                    <router-link :to="{ name: 'membre', params: { id: person.id } }">
-                        <v-avatar size="130" rounded="0" class="mr-6 bg-grey-lighten-2 elevation-1">
-                            <v-img :src="person.photoPath || defaultAvatar" cover></v-img>
-                        </v-avatar>
-                    </router-link>
-
-                    <div>
-                        <router-link :to="{ name: 'membre', params: { id: person.id } }"
-                            class="text-h5 member-name text-decoration-none d-block mb-1">
-                            {{ person.lastName }}, {{ person.firstName }}
+        <div v-else>
+            <v-row v-if="members && members.length > 0">
+                <v-col v-for="person in members" :key="person.id" cols="12" sm="6" class="mb-6">
+                    <div class="d-flex align-start">
+                        <router-link :to="{ name: 'membre', params: { id: person.id } }">
+                            <v-img :src="person.photoPath || defaultAvatar" :width="150" :aspect-ratio="3 / 4" cover
+                                class="mr-6 bg-grey-lighten-2 elevation-1"></v-img>
                         </router-link>
-                        <div class="text-body-1 text-grey-darken-3">
-                            {{ person.jobTitle }}
-                        </div>
-                        <div class="text-body-1 text-grey-darken-1">
-                            {{ person.institution?.name || 'Institution non spécifiée' }}
+
+                        <div>
+                            <router-link :to="{ name: 'membre', params: { id: person.id } }"
+                                class="text-headline-small font-weight-semibold text-primary text-decoration-none d-block mb-1">
+                                {{ person.lastName }}, {{ person.firstName }}
+                            </router-link>
+
+                            <div class="text-body-1 text-grey-darken-3">
+                                {{ person.jobTitle }}
+                            </div>
+
+                            <div class="text-body-1 text-grey-darken-1">
+                                {{ person.institution?.name || 'Institution non spécifiée' }}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </v-col>
-        </v-row>
+                </v-col>
+            </v-row>
 
-        <v-empty-state v-if="!isLoading && regularMembers.length === 0" icon="mdi-account-off-outline"
-            title="Aucun membre trouvé"
-            text="Il n'y a aucun membre régulier enregistré dans la base de données."></v-empty-state>
+            <v-empty-state v-else icon="mdi-account-off-outline" title="Aucun membre trouvé"
+                text="La base de données ne contient aucun membre régulier pour le moment.">
+            </v-empty-state>
+        </div>
     </v-container>
 </template>
-
-<style scoped>
-.color-title {
-    color: #333;
-    font-size: 2.2rem !important;
-}
-
-/* Ajustement pour l'alignement de la photo si elle est rectangulaire */
-:deep(.v-avatar .v-img__img--cover) {
-    object-position: top center;
-}
-</style>

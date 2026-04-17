@@ -7,9 +7,7 @@
                     <a href="https://www.uqac.ca/" target="_blank" class="footer-link">
                         UQAC - Université du Québec à Chicoutimi
                     </a>
-
                     |
-
                     <router-link to="/" class="footer-link">
                         Groupe de Recherche en Informatique (GRI)
                     </router-link>
@@ -23,8 +21,6 @@
                     -
                     <a href="https://www.uqac.ca/mgestion/chapitre-2/reglement-sur-lorganisation-institutionnelle-et-la-regie-interne/politique-de-confidentialite-concernant-les-renseignements-personnels-recueillis-par-moyens-technologiques/"
                         target="_blank" class="footer-link">Politique de confidentialité</a>
-                    -
-                    <a href="" target="_blank" class="footer-link">Paramètres des témoins</a>
                 </span>
             </v-col>
 

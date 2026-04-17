@@ -16,28 +16,55 @@ class PublicationRepository extends ServiceEntityRepository
         parent::__construct($registry, Publication::class);
     }
 
-    //    /**
-    //     * @return Publication[] Returns an array of Publication objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findPublicationsByFilters(?int $year, ?string $type, ?string $search, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->createQueryBuilder('p');
 
-    //    public function findOneBySomeField($value): ?Publication
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($year) {
+            $qb->andWhere('p.year = :year')
+               ->setParameter('year', $year);
+        }
+
+        if ($type && $type !== 'all') {
+            $qb->andWhere('p.publicationType = :type')
+               ->setParameter('type', $type);
+        }
+
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
+               ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%')
+               ->orderBy('score', 'ASC');
+        } else {
+            $qb->orderBy('p.year', 'DESC')
+               ->addOrderBy('p.id', 'DESC');
+        }
+
+        if ($limit) $qb->setMaxResults($limit);
+        if ($offset) $qb->setFirstResult($offset);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countPublicationsByFilters(?int $year, ?string $type, ?string $search): int
+    {
+        $qb = $this->createQueryBuilder('p')->select('count(p.id)');
+
+        if ($year) {
+            $qb->andWhere('p.year = :year')->setParameter('year', $year);
+        }
+
+        if ($type && $type !== 'all') {
+            $qb->andWhere('p.publicationType = :type')->setParameter('type', $type);
+        }
+
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }

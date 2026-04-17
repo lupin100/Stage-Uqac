@@ -6,6 +6,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { breadcrumbStore } from '../main.js'
 
+const adminUrl = `${import.meta.env.VITE_API_URL}/admin/login`
+
 const route = useRoute()
 
 const breadcrumbs = computed(() => {
@@ -13,7 +15,7 @@ const breadcrumbs = computed(() => {
 
   return metaBreadcrumbs.map(item => {
     // Si le titre est celui de la nouvelle dynamique
-    if (item.title === 'Nouvelle/:id') {
+    if (item.title === '/:id') {
       return {
         ...item,
         title: breadcrumbStore.dynamicTitle, // On utilise le titre du store
@@ -40,10 +42,7 @@ const breadcrumbs = computed(() => {
           </router-link>
         </div>
 
-        <v-text-field density="compact" variant="solo" placeholder="Rechercher..." hide-details
-          prepend-inner-icon="mdi-magnify" class="search-field" rounded="pill" />
-
-        <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" to="/admin-connexion"> </v-btn>
+        <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" :href="adminUrl"> </v-btn>
       </div>
     </div>
 
@@ -71,15 +70,15 @@ const breadcrumbs = computed(() => {
         <v-tab to="/">Accueil</v-tab>
 
         <v-tab>
-          Laboratoires
+          Laboratoire
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
               <v-list-item title="A propos" to="/a-propos" />
               <v-list-item title="Mission" to="/mission" />
               <v-list-item title="Valeurs" to="/valeurs" />
-              <v-list-item title="Comités scientifique et exécutif" to="/laboratoires/4" />
-              <v-list-item title="Conseil stratégique" to="/laboratoires/5" />
+              <v-list-item title="Comités scientifique et exécutif" to="/comites-scientifique-executif" />
+              <v-list-item title="Conseil stratégique" to="/conseil-strategique" />
             </v-list>
           </v-menu>
         </v-tab>
@@ -89,10 +88,10 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
-              <v-list-item title="Membres réguliers" to="/membres/1" />
-              <v-list-item title="Membres associé.e.s" to="/membres/2" />
-              <v-list-item title="Membres émérites" to="/membres/3" />
-              <v-list-item title="Collaborateurs" to="/membres/4" />
+              <v-list-item title="Membres réguliers" to="/membres-reguliers" />
+              <v-list-item title="Membres associé.e.s" to="/membres-associes" />
+              <v-list-item title="Membres émérites" to="/membres-emerites" />
+              <v-list-item title="Collaborateurs" to="/membres-collabos" />
               <v-list-item title="Étudiant.e.s" to="/membres/5" />
               <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
             </v-list>
@@ -108,6 +107,7 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
+              <v-list-item title="Tous les Évènements" to="/evenements" />
               <v-list-item title="Séminaires" to="/seminaires" />
               <v-list-item title="Congrès et ateliers" to="/congres-et-ateliers" />
             </v-list>
@@ -149,11 +149,6 @@ const breadcrumbs = computed(() => {
   font-size: 1.2rem;
   font-weight: 600;
   color: white;
-}
-
-.search-field {
-  max-width: 280px;
-  min-width: 220px;
 }
 
 .gray-bar {

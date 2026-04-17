@@ -17,21 +17,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class DepartementController extends AbstractController
 {
     /**
-     * GET ALL
+     * GET ALL : Liste tous les départements
      */
     #[Route('', name: 'app_departement_index', methods: ['GET'])]
     public function index(DepartementRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK);
+        return $this->json($repository->findAll(), Response::HTTP_OK, [], [
+            'groups' => 'departement:read'
+        ]);
     }
 
     /**
-     * POST
+     * POST : Créer un département
      */
     #[Route('', name: 'app_departement_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -45,38 +47,44 @@ class DepartementController extends AbstractController
         $em->persist($departement);
         $em->flush();
 
-        return $this->json($departement, Response::HTTP_CREATED);
+        return $this->json($departement, Response::HTTP_CREATED, [], [
+            'groups' => 'departement:read'
+        ]);
     }
 
     /**
-     * GET ONE
+     * GET ONE : Détails d'un département
      */
     #[Route('/{id}', name: 'app_departement_show', methods: ['GET'])]
     public function show(Departement $departement): JsonResponse
     {
-        return $this->json($departement, Response::HTTP_OK);
+        return $this->json($departement, Response::HTTP_OK, [], [
+            'groups' => 'departement:read'
+        ]);
     }
 
     /**
-     * PATCH (Mise à jour partielle)
+     * PATCH : Mise à jour partielle
      */
     #[Route('/{id}', name: 'app_departement_update', methods: ['PATCH'])]
     public function update(
-        Departement $departement, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Departement $departement,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Departement::class, 
-            'json', 
+            $request->getContent(),
+            Departement::class,
+            'json',
             ['object_to_populate' => $departement]
         );
 
         $em->flush();
 
-        return $this->json($departement, Response::HTTP_OK);
+        return $this->json($departement, Response::HTTP_OK, [], [
+            'groups' => 'departement:read'
+        ]);
     }
 
     /**
@@ -88,6 +96,6 @@ class DepartementController extends AbstractController
         $em->remove($departement);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_OK);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

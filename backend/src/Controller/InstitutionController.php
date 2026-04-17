@@ -16,16 +16,24 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api/institutions')]
 class InstitutionController extends AbstractController
 {
+    /**
+     * GET ALL : Liste toutes les institutions
+     */
     #[Route('', name: 'app_institution_index', methods: ['GET'])]
     public function index(InstitutionRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK);
+        return $this->json($repository->findAll(), Response::HTTP_OK, [], [
+            'groups' => 'institution:read'
+        ]);
     }
 
+    /**
+     * POST : Créer une institution
+     */
     #[Route('', name: 'app_institution_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -39,40 +47,55 @@ class InstitutionController extends AbstractController
         $em->persist($institution);
         $em->flush();
 
-        return $this->json($institution, Response::HTTP_CREATED);
+        return $this->json($institution, Response::HTTP_CREATED, [], [
+            'groups' => 'institution:read'
+        ]);
     }
 
+    /**
+     * GET ONE : Détails d'une institution
+     */
     #[Route('/{id}', name: 'app_institution_show', methods: ['GET'])]
     public function show(Institution $institution): JsonResponse
     {
-        return $this->json($institution, Response::HTTP_OK);
+        return $this->json($institution, Response::HTTP_OK, [], [
+            'groups' => 'institution:read'
+        ]);
     }
 
+    /**
+     * PATCH : Mise à jour partielle
+     */
     #[Route('/{id}', name: 'app_institution_update', methods: ['PATCH'])]
     public function update(
-        Institution $institution, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Institution $institution,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Institution::class, 
-            'json', 
+            $request->getContent(),
+            Institution::class,
+            'json',
             ['object_to_populate' => $institution]
         );
 
         $em->flush();
 
-        return $this->json($institution, Response::HTTP_OK);
+        return $this->json($institution, Response::HTTP_OK, [], [
+            'groups' => 'institution:read'
+        ]);
     }
 
+    /**
+     * DELETE
+     */
     #[Route('/{id}', name: 'app_institution_delete', methods: ['DELETE'])]
     public function delete(Institution $institution, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($institution);
         $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_OK);
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

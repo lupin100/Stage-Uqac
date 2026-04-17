@@ -16,28 +16,57 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
-    //    /**
-    //     * @return Project[] Returns an array of Project objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findProjectsByFilters(?string $status, ?string $search, ?string $thematic, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->createQueryBuilder('p');
 
-    //    public function findOneBySomeField($value): ?Project
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($status === 'finished') {
+            $qb->andWhere('p.isFinished = true');
+        } elseif ($status === 'ongoing') {
+            $qb->andWhere('p.isFinished = false');
+        }
+
+        if ($thematic && $thematic !== 'all') {
+            $qb->andWhere('p.thematic = :thematic')
+               ->setParameter('thematic', $thematic);
+        }
+
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
+               ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%')
+               ->orderBy('score', 'ASC');
+        } else {
+            $qb->orderBy('p.id', 'DESC');
+        }
+
+        if ($limit) $qb->setMaxResults($limit);
+        if ($offset) $qb->setFirstResult($offset);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countProjectsByFilters(?string $status, ?string $search, ?string $thematic): int
+    {
+        $qb = $this->createQueryBuilder('p')->select('count(p.id)');
+
+        if ($status === 'finished') {
+            $qb->andWhere('p.isFinished = true');
+        } elseif ($status === 'ongoing') {
+            $qb->andWhere('p.isFinished = false');
+        }
+
+        if ($thematic && $thematic !== 'all') {
+            $qb->andWhere('p.thematic = :thematic')->setParameter('thematic', $thematic);
+        }
+
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }
