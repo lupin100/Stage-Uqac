@@ -16,6 +16,27 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
+        # Firewall pour l'administration (EasyAdmin)
+        admin:
+            pattern: ^/admin
+            lazy: true
+            provider: app_user_provider
+            
+            custom_authenticator: App\Security\AdminAuthenticator
+            entry_point: App\Security\AdminAuthenticator
+
+            logout:
+                path: app_logout
+                target: app_login
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # by default, the feature is enabled by checking a checkbox in the
+                # login form, uncomment the following line to always enable it.
+                #always_remember_me: true
+
         # Firewall spécifique pour la ROUTE DE LOGIN (récupération du token)
         login:
             pattern: ^/api/login
@@ -42,6 +63,9 @@ security:
         # 3. Toutes les autres méthodes (POST, PATCH, DELETE, PUT) exigent le rôle ADMIN
         # Note : IS_AUTHENTICATED_FULLY vérifie que l'utilisateur est loggé via JWT
         - { path: ^/api, roles: ROLE_ADMIN }
+
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
 
 # Configuration spécifique aux tests (vitesse de hachage)
 when@test:
