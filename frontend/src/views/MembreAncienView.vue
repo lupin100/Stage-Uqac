@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 import { breadcrumbStore } from '../main.js'
 import Tableau from '../components/Tableau.vue'
 
-const students = ref([])
+const formerStudents = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
 
@@ -17,41 +17,43 @@ const headers = [
   { title: 'SUJET', key: 'topic' },
 ]
 
-const formatYear = (startYear) => {
-  return startYear ? `${startYear}` : '—'
+const formatYears = (startYear, endYear) => {
+  if (startYear && endYear) return `${startYear}/${endYear}`
+  if (startYear) return `${startYear}`
+  return '—'
 }
 
-const fetchStudents = async () => {
+const fetchFormerStudents = async () => {
   try {
     isLoading.value = true
     errorMessage.value = null
-    breadcrumbStore.dynamicTitle = 'Étudiant(e)s'
+    breadcrumbStore.dynamicTitle = 'Ancien.ne.s étudiant.e.s'
 
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/student-profiles/details/etudiants`
+      `${import.meta.env.VITE_API_URL}/api/student-profiles/details/anciens-etudiants`
     )
 
     if (!response.ok) {
-      throw new Error('Impossible de récupérer les étudiant(e)s')
+      throw new Error('Impossible de récupérer les ancien.ne.s étudiant.e.s')
     }
 
     const data = await response.json()
 
-    students.value = Array.isArray(data)
-    ? data.map((student) => ({
-        ...student,
-        annee: formatYear(student.start_year),
+    formerStudents.value = Array.isArray(data)
+      ? data.map((student) => ({
+          ...student,
+          annee: formatYears(student.start_year, student.end_year),
         }))
-    : []
+      : []
   } catch (error) {
-    errorMessage.value = "Impossible de charger la liste des étudiant(e)s."
+    errorMessage.value = "Impossible de charger la liste des ancien.ne.s étudiant.e.s."
     console.error(error)
   } finally {
     isLoading.value = false
   }
 }
 
-onMounted(fetchStudents)
+onMounted(fetchFormerStudents)
 </script>
 
 <template>
@@ -65,15 +67,15 @@ onMounted(fetchStudents)
     </v-alert>
 
     <div v-else>
-      <h2>Étudiant.e.s</h2>
+      <h2>Ancien.ne.s étudiant.e.s</h2>
 
       <Tableau
         :headers="headers"
-        :items="students"
+        :items="formerStudents"
         :loading="isLoading"
         item-value="id"
         :items-per-page="10"
-        no-data-text="Aucun étudiant actuel trouvé."
+        no-data-text="Aucun ancien étudiant trouvé."
         class="students-table"
       >
         <template #item.nom="{ item }">
