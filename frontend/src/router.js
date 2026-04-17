@@ -92,7 +92,6 @@ const router = createRouter({
     {
       path: '/membres-reguliers', name: 'membres-reguliers', component: MembresReguliersView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' } ] }
-
     },
     {
       path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
