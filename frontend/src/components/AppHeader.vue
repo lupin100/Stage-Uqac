@@ -68,7 +68,7 @@ const breadcrumbs = computed(() => {
         <v-tab to="/">Accueil</v-tab>
 
         <v-tab>
-          Laboratoires
+          Laboratoire
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
@@ -105,6 +105,7 @@ const breadcrumbs = computed(() => {
           <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
           <v-menu activator="parent">
             <v-list>
+              <v-list-item title="Tous les Évènements" to="/evenements" />
               <v-list-item title="Séminaires" to="/seminaires" />
               <v-list-item title="Congrès et ateliers" to="/congres-et-ateliers" />
             </v-list>

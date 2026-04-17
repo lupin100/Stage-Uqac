@@ -94,7 +94,7 @@ const router = createRouter({
     },
     {
       path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Détails' }, { title: '/:id' } ] }
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres' }, { title: '/:id' } ] }
     },
     {
       path: '/membres-associes', name: 'membres-associes', component: MembresAssociesView, meta: {
