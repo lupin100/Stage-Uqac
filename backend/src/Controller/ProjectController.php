@@ -17,21 +17,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProjectController extends AbstractController
 {
     /**
-     * GET ALL : Liste tous les projets
+     * GET ALL : Liste tous les projets filtrés avec leurs contributeurs
      */
-   #[Route('', name: 'app_project_index', methods: ['GET'])]
+    #[Route('', name: 'app_project_index', methods: ['GET'])]
     public function index(Request $request, ProjectRepository $repository): JsonResponse
     {
         $status = $request->query->get('status');
         $thematic = $request->query->get('thematic');
-        $search = $request->query->get('q');         
+        $search = $request->query->get('q');
 
         $page = $request->query->get('page');
         $limit = (int) $request->query->get('limit', 5);
 
+        $context = ['groups' => 'project:read'];
+
         if ($page === null) {
             $projects = $repository->findProjectsByFilters($status, $search, $thematic);
-            return $this->json($projects, Response::HTTP_OK);
+            return $this->json($projects, Response::HTTP_OK, [], $context);
         }
 
         $page = max(1, (int) $page);
@@ -51,7 +53,7 @@ class ProjectController extends AbstractController
                 'thematic' => $thematic,
                 'search' => $search
             ]
-        ]);
+        ], Response::HTTP_OK, [], $context);
     }
 
     /**
@@ -75,19 +77,19 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
 
-            return $this->json($project, Response::HTTP_CREATED);
+            return $this->json($project, Response::HTTP_CREATED, [], ['groups' => 'project:read']);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
         }
     }
 
     /**
-     * GET ONE : Détails d'un projet
+     * GET ONE : Détails d'un projet spécifique
      */
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): JsonResponse
     {
-        return $this->json($project, Response::HTTP_OK);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project:read']);
     }
 
     /**
@@ -109,7 +111,7 @@ class ProjectController extends AbstractController
 
         $em->flush();
 
-        return $this->json($project, Response::HTTP_OK);
+        return $this->json($project, Response::HTTP_OK, [], ['groups' => 'project:read']);
     }
 
     /**

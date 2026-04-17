@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Enum\PublicationEnum;
 use App\Repository\PublicationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups; // Import crucial
 
@@ -32,9 +34,18 @@ class Publication
     #[Groups(['contributor:read', 'publication:read'])]
     private ?PublicationEnum $publicationType = null;
 
-    #[ORM\ManyToOne(inversedBy: 'publications')]
+    /**
+     * @var Collection<int, Contributor>
+     */
+    #[ORM\ManyToMany(targetEntity: Contributor::class, mappedBy: 'publications')]
     #[Groups(['publication:read'])]
-    private ?Contributor $contributor = null;
+    private Collection $contributors;
+
+    public function __construct()
+    {
+        $this->contributors = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -85,14 +96,32 @@ class Publication
         return $this;
     }
 
-    public function getContributor(): ?Contributor
+    /**
+     * @return Collection<int, Contributor>
+     */
+    public function getContributors(): Collection
     {
-        return $this->contributor;
+        return $this->contributors;
     }
 
-    public function setContributor(?Contributor $contributor): static
+    public function addContributor(Contributor $contributor): static
     {
-        $this->contributor = $contributor;
+        if (!$this->contributors->contains($contributor)) {
+            $this->contributors->add($contributor);
+            $contributor->addPublication($this);
+        }
+
         return $this;
     }
+
+    public function removeContributor(Contributor $contributor): static
+    {
+        if ($this->contributors->removeElement($contributor)) {
+            $contributor->removePublication($this);
+        }
+
+        return $this;
+    }
+
+
 }

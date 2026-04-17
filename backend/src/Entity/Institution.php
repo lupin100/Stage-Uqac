@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\InstitutionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups; 
+use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: InstitutionRepository::class)]
 class Institution
 {
@@ -22,13 +24,23 @@ class Institution
     #[Groups(['person:read', 'institution:read', 'departement:read'])]
     private ?string $url = null;
 
-    #[ORM\OneToOne(mappedBy: 'institution', cascade: ['persist', 'remove'])]
-    #[Groups(['institution:read'])]
-    private ?Person $person = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'institution')]
     #[Groups(['person:read', 'institution:read'])]
     private ?Departement $departement = null;
+
+    /**
+     * @var Collection<int, Person>
+     */
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'institutions')]
+    #[Groups(['institution:read'])]
+    private Collection $persons;
+
+    public function __construct()
+    {
+        $this->persons = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -57,24 +69,7 @@ class Institution
         return $this;
     }
 
-    public function getPerson(): ?Person
-    {
-        return $this->person;
-    }
 
-    public function setPerson(?Person $person): static
-    {
-        if ($person === null && $this->person !== null) {
-            $this->person->setInstitution(null);
-        }
-
-        if ($person !== null && $person->getInstitution() !== $this) {
-            $person->setInstitution($this);
-        }
-
-        $this->person = $person;
-        return $this;
-    }
 
     public function getDepartement(): ?Departement
     {
@@ -84,6 +79,33 @@ class Institution
     public function setDepartement(?Departement $departement): static
     {
         $this->departement = $departement;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Person>
+     */
+    public function getPersons(): Collection
+    {
+        return $this->persons;
+    }
+
+    public function addPerson(Person $person): static
+    {
+        if (!$this->persons->contains($person)) {
+            $this->persons->add($person);
+            $person->addInstitution($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerson(Person $person): static
+    {
+        if ($this->persons->removeElement($person)) {
+            $person->removeInstitution($this);
+        }
+
         return $this;
     }
 }

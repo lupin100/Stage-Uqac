@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups; // Import indispensable
 
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
-#[ORM\HasLifecycleCallbacks] 
+#[ORM\HasLifecycleCallbacks]
 class Person
 {
     #[ORM\Id]
@@ -63,13 +63,7 @@ class Person
     #[Groups(['person:read'])]
     private ?PersonEnum $role = null;
 
-    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
-    #[Groups(['person:read'])]
-    private ?Institution $institution = null;
 
-    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
-    #[Groups(['person:read'])]
-    private ?Departement $departement = null;
 
     #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -81,12 +75,26 @@ class Person
     private ?Contributor $contributor = null;
 
     #[ORM\OneToMany(mappedBy: 'supervisor', targetEntity: StudentProfile::class)]
-    #[Groups(['person:read'])] // Pour voir les étudiants depuis le profil du prof
+    #[Groups(['person:read'])]
     private Collection $supervisedStudents;
 
     #[ORM\OneToMany(mappedBy: 'coSupervisor', targetEntity: StudentProfile::class)]
     #[Groups(['person:read'])]
     private Collection $coSupervisedStudents;
+
+    /**
+     * @var Collection<int, Departement>
+     */
+    #[ORM\ManyToMany(targetEntity: Departement::class, inversedBy: 'persons')]
+    #[Groups(['person:read'])]
+    private Collection $departements;
+
+    /**
+     * @var Collection<int, Institution>
+     */
+    #[ORM\ManyToMany(targetEntity: Institution::class, inversedBy: 'persons')]
+    #[Groups(['person:read'])]
+    private Collection $institutions;
 
     public function __construct()
     {
@@ -94,6 +102,8 @@ class Person
         $this->updatedAt = new \DateTimeImmutable();
         $this->supervisedStudents = new ArrayCollection();
         $this->coSupervisedStudents = new ArrayCollection();
+        $this->departements = new ArrayCollection();
+        $this->institutions = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -227,27 +237,6 @@ class Person
         return $this;
     }
 
-    public function getInstitution(): ?Institution
-    {
-        return $this->institution;
-    }
-
-    public function setInstitution(?Institution $institution): static
-    {
-        $this->institution = $institution;
-        return $this;
-    }
-
-    public function getDepartement(): ?Departement
-    {
-        return $this->departement;
-    }
-
-    public function setDepartement(?Departement $departement): static
-    {
-        $this->departement = $departement;
-        return $this;
-    }
 
     public function getStudentProfile(): ?StudentProfile
     {
@@ -333,6 +322,54 @@ class Person
                 $studentProfile->setCoSupervisor(null);
             }
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Departement>
+     */
+    public function getDepartements(): Collection
+    {
+        return $this->departements;
+    }
+
+    public function addDepartement(Departement $departement): static
+    {
+        if (!$this->departements->contains($departement)) {
+            $this->departements->add($departement);
+        }
+
+        return $this;
+    }
+
+    public function removeDepartement(Departement $departement): static
+    {
+        $this->departements->removeElement($departement);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Institution>
+     */
+    public function getInstitutions(): Collection
+    {
+        return $this->institutions;
+    }
+
+    public function addInstitution(Institution $institution): static
+    {
+        if (!$this->institutions->contains($institution)) {
+            $this->institutions->add($institution);
+        }
+
+        return $this;
+    }
+
+    public function removeInstitution(Institution $institution): static
+    {
+        $this->institutions->removeElement($institution);
+
         return $this;
     }
 }

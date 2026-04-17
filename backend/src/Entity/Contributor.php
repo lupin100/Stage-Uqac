@@ -14,27 +14,37 @@ class Contributor
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['contributor:read', 'publication:read'])]
+    #[Groups(['contributor:read', 'publication:read','project:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['contributor:read', 'publication:read'])]
+    #[Groups(['contributor:read', 'publication:read','project:read'])]
     private ?string $displayName = null;
+
+
+
+    #[ORM\OneToOne(inversedBy: 'contributor', cascade: ['persist', 'remove'])]
+    #[Groups(['publication:read', 'contributor:read','project:read'])]
+    private ?Person $person = null;
 
     /**
      * @var Collection<int, Publication>
      */
-    #[ORM\OneToMany(targetEntity: Publication::class, mappedBy: 'contributor')]
-    #[Groups(['person:read', 'contributor:read'])]
+    #[ORM\ManyToMany(targetEntity: Publication::class, inversedBy: 'contributors')]
+    #[Groups(['contributor:read'])]
     private Collection $publications;
 
-    #[ORM\OneToOne(inversedBy: 'contributor', cascade: ['persist', 'remove'])]
-    #[Groups(['publication:read', 'contributor:read'])]
-    private ?Person $person = null;
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'contributors')]
+    #[Groups(['contributor:read'])]
+    private Collection $projects;
 
     public function __construct()
     {
         $this->publications = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -53,6 +63,20 @@ class Contributor
         return $this;
     }
 
+
+
+    public function getPerson(): ?Person
+    {
+        return $this->person;
+    }
+
+    public function setPerson(?Person $person): static
+    {
+        $this->person = $person;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Publication>
      */
@@ -65,7 +89,6 @@ class Contributor
     {
         if (!$this->publications->contains($publication)) {
             $this->publications->add($publication);
-            $publication->setContributor($this);
         }
 
         return $this;
@@ -73,23 +96,31 @@ class Contributor
 
     public function removePublication(Publication $publication): static
     {
-        if ($this->publications->removeElement($publication)) {
-            if ($publication->getContributor() === $this) {
-                $publication->setContributor(null);
-            }
+        $this->publications->removeElement($publication);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
         }
 
         return $this;
     }
 
-    public function getPerson(): ?Person
+    public function removeProject(Project $project): static
     {
-        return $this->person;
-    }
-
-    public function setPerson(?Person $person): static
-    {
-        $this->person = $person;
+        $this->projects->removeElement($project);
 
         return $this;
     }

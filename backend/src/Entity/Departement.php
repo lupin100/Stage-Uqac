@@ -25,9 +25,6 @@ class Departement
     #[Groups(['person:read', 'departement:read'])]
     private ?string $url = null;
 
-    #[ORM\OneToOne(mappedBy: 'departement', cascade: ['persist', 'remove'])]
-    #[Groups(['departement:read'])]
-    private ?Person $person = null;
 
     /**
      * @var Collection<int, Institution>
@@ -36,9 +33,17 @@ class Departement
     #[Groups(['departement:read'])]
     private Collection $institution;
 
+    /**
+     * @var Collection<int, Person>
+     */
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'departements')]
+    #[Groups(['departement:read'])]
+    private Collection $persons;
+
     public function __construct()
     {
         $this->institution = new ArrayCollection();
+        $this->persons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -68,24 +73,7 @@ class Departement
         return $this;
     }
 
-    public function getPerson(): ?Person
-    {
-        return $this->person;
-    }
 
-    public function setPerson(?Person $person): static
-    {
-        if ($person === null && $this->person !== null) {
-            $this->person->setDepartement(null);
-        }
-
-        if ($person !== null && $person->getDepartement() !== $this) {
-            $person->setDepartement($this);
-        }
-
-        $this->person = $person;
-        return $this;
-    }
 
     /**
      * @return Collection<int, Institution>
@@ -111,6 +99,33 @@ class Departement
             if ($institution->getDepartement() === $this) {
                 $institution->setDepartement(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Person>
+     */
+    public function getPersons(): Collection
+    {
+        return $this->persons;
+    }
+
+    public function addPerson(Person $person): static
+    {
+        if (!$this->persons->contains($person)) {
+            $this->persons->add($person);
+            $person->addDepartement($this);
+        }
+
+        return $this;
+    }
+
+    public function removePerson(Person $person): static
+    {
+        if ($this->persons->removeElement($person)) {
+            $person->removeDepartement($this);
         }
 
         return $this;
