@@ -16,8 +16,6 @@ import EvenementsView from './views/Evenements.vue'
 import ProjectsView from './views/ProjetsView.vue'
 import MembresReguliersView from './views/MembresReguliersView.vue'
 import MembreCollaboView from './views/MembreCollaboView.vue'
-import ConnexionView from './views/admin/ConnexionView.vue'
-import DashboardView from './views/admin/DashboardView.vue'
 import ConseilStrategiqueView from './views/ConseilStrategiqueView.vue'
 import ComitesSciExecView from './views/ComitesSciExecView.vue'
 import MembresAssociesView from './views/MembresAssociesView.vue'
@@ -120,6 +118,7 @@ const router = createRouter({
     {
       path: '/comites-scientifique-executif', name: 'comites-scientifique-executif', component: ComitesSciExecView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Comités scientifique et exécutif', to: '/comites-scientifique-executif' } ] }
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: '/:id' } ] }
     }
   ]
 })

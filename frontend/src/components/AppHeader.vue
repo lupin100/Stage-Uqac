@@ -6,6 +6,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { breadcrumbStore } from '../main.js'
 
+const adminUrl = `${import.meta.env.VITE_API_URL}/admin/login`
+
 const route = useRoute()
 
 const breadcrumbs = computed(() => {
@@ -40,7 +42,7 @@ const breadcrumbs = computed(() => {
           </router-link>
         </div>
 
-        <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" to="/admin-connexion"> </v-btn>
+        <v-btn icon="mdi-account" color="white" variant="tonal" class="ml-2" :href="adminUrl"> </v-btn>
       </div>
     </div>
 
