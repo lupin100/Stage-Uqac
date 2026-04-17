@@ -32,26 +32,26 @@ class ProjectController extends AbstractController
         $context = ['groups' => 'project:read'];
 
         if ($page === null) {
-            $projects = $repository->findProjectsByFilters($status, $search, $thematic);
-            return $this->json($projects, Response::HTTP_OK, [], $context);
+            $paginator = $repository->findProjectsByFilters($status, $search, $thematic);
+            return $this->json(iterator_to_array($paginator), Response::HTTP_OK, [], $context);
         }
 
         $page = max(1, (int) $page);
         $offset = ($page - 1) * $limit;
 
-        $projects = $repository->findProjectsByFilters($status, $search, $thematic, $limit, $offset);
-        $total = $repository->countProjectsByFilters($status, $search, $thematic);
+        $paginator = $repository->findProjectsByFilters($status, $search, $thematic, $limit, $offset);
+        $total = count($paginator);
 
         return $this->json([
-            'data'  => $projects,
-            'total' => $total,
-            'page'  => $page,
-            'limit' => $limit,
+            'data'      => iterator_to_array($paginator),
+            'total'     => $total,
+            'page'      => $page,
+            'limit'     => $limit,
             'last_page' => ceil($total / $limit),
-            'filters' => [
-                'status' => $status,
+            'filters'   => [
+                'status'   => $status,
                 'thematic' => $thematic,
-                'search' => $search
+                'search'   => $search
             ]
         ], Response::HTTP_OK, [], $context);
     }
