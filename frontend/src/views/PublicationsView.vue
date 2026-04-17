@@ -81,16 +81,26 @@ onMounted(fetchPublications)
                                     {{ pub.title }}
                                 </v-card-title>
 
-                                <v-card-subtitle class="px-0 text-body-1 italic">
-                                    <router-link v-if="pub.contributor?.person"
-                                        :to="{ name: 'membre', params: { id: pub.contributor.person.id } }"
-                                        class="text-black text-decoration-none author-link">
-                                        {{ pub.contributor.person.firstName }} {{ pub.contributor.person.lastName }}
-                                    </router-link>
+                                <v-card-subtitle class="px-0 text-body-1 italic text-grey-darken-2">
 
-                                    <span v-else>
-                                        {{ pub.contributor?.displayName || 'Auteur inconnu' }}
-                                    </span>
+                                    <template v-if="pub.contributors && pub.contributors.length > 0">
+                                        <span v-for="(contributor, index) in pub.contributors" :key="contributor.id">
+
+                                            <router-link v-if="contributor.person"
+                                                :to="{ name: 'membre', params: { id: contributor.person.id } }"
+                                                class="text-black text-decoration-none author-link font-weight-medium">
+                                                {{ contributor.person.firstName }} {{ contributor.person.lastName }}
+                                            </router-link>
+
+                                            <span v-else class="text-black">
+                                                {{ contributor.displayName }}
+                                            </span>
+
+                                            <span v-if="index < pub.contributors.length - 1" class="mr-1">, </span>
+                                        </span>
+                                    </template>
+
+                                    <span v-else>Auteur inconnu</span>
                                 </v-card-subtitle>
                             </v-col>
 

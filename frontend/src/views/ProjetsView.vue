@@ -76,8 +76,24 @@ onMounted(fetchProjects)
                                 </v-card-title>
 
                                 <v-card-subtitle class="px-0 text-body-1 text-grey-darken-2 italic">
-                                    <v-icon start size="18">mdi-account-circle-outline</v-icon>
-                                    {{ project.fundingSource || 'Auteur non spécifié' }}
+
+                                    <template v-if="project.contributors && project.contributors.length > 0">
+                                        <span v-for="(contributor, index) in project.contributors"
+                                            :key="contributor.id">
+
+                                            <router-link v-if="contributor.person"
+                                                :to="{ name: 'membre', params: { id: contributor.person.id } }"
+                                                class="text-black text-decoration-none author-link">
+                                                {{ contributor.person.firstName }} {{ contributor.person.lastName }}
+                                            </router-link>
+
+                                            <span v-else class="text-grey-darken-3">{{ contributor.displayName }}</span>
+
+                                            <span v-if="index < project.contributors.length - 1" class="mr-1">, </span>
+                                        </span>
+                                    </template>
+
+                                    <span v-else>Auteur non spécifié</span>
                                 </v-card-subtitle>
 
                                 <v-card-text v-if="project.summary" class="px-0 pt-4 text-body-2 text-truncate-2">
@@ -87,13 +103,9 @@ onMounted(fetchProjects)
                         </v-row>
 
                         <v-card-actions class="px-0 mt-4">
-                            <v-chip 
-                                class="px-3 font-weight-bold" 
-                                rounded="pill" 
+                            <v-chip class="px-3 font-weight-bold" rounded="pill"
                                 :color="project.isFinished ? 'primary' : 'grey-lighten-1'"
-                                :class="project.isFinished ? 'text-white' : 'text-grey-darken-3'" 
-                                size="small"
-                            >
+                                :class="project.isFinished ? 'text-white' : 'text-grey-darken-3'" size="small">
                                 {{ project.isFinished ? 'Terminé' : 'En cours' }}
                             </v-chip>
                         </v-card-actions>
@@ -102,21 +114,12 @@ onMounted(fetchProjects)
             </v-row>
 
             <div class="mt-10 d-flex justify-center">
-                <v-pagination
-                    v-model="currentPage"
-                    :length="totalPages"
-                    :total-visible="3"
-                    color="primary"
-                    rounded="rounded"
-                ></v-pagination>
+                <v-pagination v-model="currentPage" :length="totalPages" :total-visible="3" color="primary"
+                    rounded="rounded"></v-pagination>
             </div>
 
-            <v-empty-state 
-                v-if="projects.length === 0" 
-                icon="mdi-folder-open-outline" 
-                title="Aucun projet"
-                text="Il n'y a aucun projet à afficher pour le moment."
-            ></v-empty-state>
+            <v-empty-state v-if="projects.length === 0" icon="mdi-folder-open-outline" title="Aucun projet"
+                text="Il n'y a aucun projet à afficher pour le moment."></v-empty-state>
         </div>
     </v-container>
 </template>
