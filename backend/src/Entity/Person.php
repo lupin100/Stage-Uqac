@@ -16,7 +16,7 @@ class Person
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['person:read'])]
+    #[Groups(['person:read', 'publication:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 2500, nullable: true)]
@@ -36,11 +36,11 @@ class Person
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['person:read'])]
+    #[Groups(['person:read', 'publication:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['person:read'])]
+    #[Groups(['person:read', 'publication:read'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 180, nullable: true)]

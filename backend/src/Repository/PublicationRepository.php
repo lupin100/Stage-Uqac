@@ -67,4 +67,24 @@ class PublicationRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function findAllWithDetails(?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.contributor', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.person', 'pers')
+            ->addSelect('pers')
+            ->orderBy('p.year', 'DESC');
+
+        // On applique la limite et l'offset s'ils sont fournis
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
