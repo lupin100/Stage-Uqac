@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @extends ServiceEntityRepository<Project>
@@ -16,9 +17,13 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
-    public function findProjectsByFilters(?string $status, ?string $search, ?string $thematic, ?int $limit = null, ?int $offset = null): array
+    public function findProjectsByFilters(?string $status, ?string $search, ?string $thematic, ?int $limit = null, ?int $offset = null): Paginator
     {
-        $qb = $this->createQueryBuilder('p');
+        $qb = $this->createQueryBuilder('p')
+        ->leftJoin('p.contributors', 'c')
+        ->addSelect('c')
+        ->leftJoin('c.person', 'pers')
+        ->addSelect('pers');
 
         if ($status === 'finished') {
             $qb->andWhere('p.isFinished = true');
@@ -44,7 +49,7 @@ class ProjectRepository extends ServiceEntityRepository
         if ($limit) $qb->setMaxResults($limit);
         if ($offset) $qb->setFirstResult($offset);
 
-        return $qb->getQuery()->getResult();
+        return new Paginator($qb->getQuery(), true);
     }
 
     public function countProjectsByFilters(?string $status, ?string $search, ?string $thematic): int
@@ -68,5 +73,15 @@ class ProjectRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function findDistinctThematics(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('DISTINCT p.thematic')
+            ->where('p.thematic IS NOT NULL')
+            ->orderBy('p.thematic', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

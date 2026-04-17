@@ -69,7 +69,7 @@ onMounted(fetchMembers)
                             </div>
 
                             <div class="text-body-1 text-grey-darken-1">
-                                {{ person.institution?.name || 'Institution non spécifiée' }}
+                                {{ person.institutions[0]?.name || 'Institution non spécifiée' }}
                             </div>
                         </div>
                     </div>

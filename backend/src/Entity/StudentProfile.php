@@ -27,7 +27,6 @@ class StudentProfile
 
     #[ORM\OneToOne(mappedBy: 'studentProfile', cascade: ['persist', 'remove'])]
     #[Groups(['student:read'])]
-    // On ne met PAS 'person:read' ici pour briser la boucle
     private ?Person $person = null;
 
     #[ORM\ManyToOne(inversedBy: 'studentProfile')]
@@ -105,5 +104,10 @@ class StudentProfile
         $this->topic = $topic;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->person ? $this->person->getFirstName() . ' ' . $this->person->getLastName() : 'N/A';
     }
 }

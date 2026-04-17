@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class PublicationController extends AbstractController
 {
     /**
-     * GET ALL : Liste toutes les publications avec leur contributeur
+     * GET ALL : Liste les publications avec filtres et pagination réelle
      */
     #[Route('', name: 'app_publication_index', methods: ['GET'])]
     public function index(Request $request, PublicationRepository $repository): JsonResponse
@@ -27,21 +27,24 @@ class PublicationController extends AbstractController
         $search = $request->query->get('q');
 
         $page = $request->query->get('page');
-        $limit = max(1, (int) $request->query->get('limit', 10));
+        $limit = (int) $request->query->get('limit', 5);
+
+        $context = ['groups' => 'publication:read'];
 
         if ($page === null) {
-            $publications = $repository->findPublicationsByFilters($year, $type, $search);
-            return $this->json($publications, Response::HTTP_OK, [], ['groups' => 'publication:read']);
+            $paginator = $repository->findPublicationsByFilters($year, $type, $search);
+            // On transforme l'itérateur en tableau pour la réponse JSON
+            return $this->json(iterator_to_array($paginator), Response::HTTP_OK, [], $context);
         }
 
         $page = max(1, (int) $page);
         $offset = ($page - 1) * $limit;
 
-        $publications = $repository->findPublicationsByFilters($year, $type, $search, $limit, $offset);
-        $total = $repository->countPublicationsByFilters($year, $type, $search);
+        $paginator = $repository->findPublicationsByFilters($year, $type, $search, $limit, $offset);
+        $total = count($paginator);
 
         return $this->json([
-            'data' => $publications,
+            'data' => iterator_to_array($paginator),
             'total' => $total,
             'page' => $page,
             'limit' => $limit,
@@ -51,35 +54,21 @@ class PublicationController extends AbstractController
                 'type' => $type,
                 'search' => $search
             ]
-        ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
+        ], Response::HTTP_OK, [], $context);
     }
 
-    #[Route('/details', name: 'app_publication_details', methods: ['GET'])]
-    public function getDetails(Request $request, PublicationRepository $repository): JsonResponse
+    #[Route('/years', name: 'app_publication_years', methods: ['GET'])]
+    public function getYears(PublicationRepository $repository): JsonResponse
     {
-        $page = $request->query->get('page');
+        $results = $repository->findDistinctYears();
+        return $this->json(array_column($results, 'year'));
+    }
 
-        // Pas de pagination : on récupère tout avec les détails
-        if ($page === null) {
-            $publications = $repository->findAllWithDetails();
-            return $this->json($publications, Response::HTTP_OK, [], ['groups' => 'publication:read']);
-        }
-
-        // Avec pagination
-        $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 10));
-        $offset = ($page - 1) * $limit;
-
-        // On passe les arguments à la méthode qui les accepte maintenant
-        $publications = $repository->findAllWithDetails($limit, $offset);
-        $total = $repository->count([]);
-
-        return $this->json([
-            'data' => $publications,
-            'page' => $page,
-            'limit' => $limit,
-            'total' => $total
-        ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
+    #[Route('/types', name: 'app_publication_types', methods: ['GET'])]
+    public function getTypes(PublicationRepository $repository): JsonResponse
+    {
+        $results = $repository->findDistinctTypes();
+        return $this->json(array_column($results, 'publicationType'));
     }
 
     /**

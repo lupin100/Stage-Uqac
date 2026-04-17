@@ -44,7 +44,9 @@ onMounted(() => {
 <template>
     <div class="section-header">Publications</div>
 
-    <v-progress-circular v-if="isLoadingPublications" indeterminate color="primary" class="mt-4" />
+    <div v-if="isLoadingPublications" class="mt-4">
+        <v-progress-circular v-if="isLoadingPublications" indeterminate color="primary" class="mt-4" />
+    </div>
 
     <v-alert v-else-if="publicationsError" type="error" variant="tonal" class="mt-4">
         {{ publicationsError }}
