@@ -16,6 +16,8 @@ import EvenementsView from './views/Evenements.vue'
 import ProjectsView from './views/ProjetsView.vue'
 import MembresReguliersView from './views/MembresReguliersView.vue'
 import MembreCollaboView from './views/MembreCollaboView.vue'
+import MembresEtudiantsView from './views/MembresEtudiantsView.vue'
+import MembreAncienView from './views/MembreAncienView.vue'
 import ConseilStrategiqueView from './views/ConseilStrategiqueView.vue'
 import ComitesSciExecView from './views/ComitesSciExecView.vue'
 import MembresAssociesView from './views/MembresAssociesView.vue'
@@ -105,6 +107,14 @@ const router = createRouter({
     {
       path: '/membres-collabos', name: 'membres-collabos', component: MembresCollabosView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Collaborateurs', to: '/membres-collabos' } ] }
+    },
+    {
+      path: '/etudiants', name: 'etudiants', component: MembresEtudiantsView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Etudiant.e.s', to: '/etudiants' } ] }
+    },
+    {
+      path: '/ancien-etudiants', name: 'ancien-etudiants', component: MembreAncienView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Ancien.ne.s étudiant.e.s', to: '/ancien-etudiants' } ] }
     },
     {
       path: '/comites-scientifique-executif', name: 'comites-scientifique-executif', component: ComitesSciExecView, meta: {

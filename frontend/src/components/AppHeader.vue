@@ -92,8 +92,8 @@ const breadcrumbs = computed(() => {
               <v-list-item title="Membres associé.e.s" to="/membres-associes" />
               <v-list-item title="Membres émérites" to="/membres-emerites" />
               <v-list-item title="Collaborateurs" to="/membres-collabos" />
-              <v-list-item title="Étudiant.e.s" to="/membres/5" />
-              <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
+              <v-list-item title="Étudiant.e.s" to="/etudiants" />
+              <v-list-item title="Ancien.ne.s étudiant.e.s" to="/ancien-etudiants" />
             </v-list>
           </v-menu>
         </v-tab>
