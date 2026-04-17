@@ -16,6 +16,28 @@ class PersonRepository extends ServiceEntityRepository
         parent::__construct($registry, Person::class);
     }
 
+    public function findStudentsBySupervisor(int $supervisorId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.studentProfile', 'sp')
+            ->leftJoin('sp.studentDegree', 'sd')
+            ->where('sp.supervisor = :id')
+            ->orWhere('sp.coSupervisor = :id')
+            ->setParameter('id', $supervisorId)
+            ->select([
+                'p.id AS id_person',
+                'p.firstName AS firstName',
+                'p.lastName AS lastName',
+                'p.role AS role',
+                'sp.id AS id_studentProfile',
+                'sp.topic AS topic',
+                'sd.degree AS degree',
+                'sd.startYear AS startYear'
+            ])
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findDetailedPersonById(int $id): ?array
     {
         return $this->createQueryBuilder('p')

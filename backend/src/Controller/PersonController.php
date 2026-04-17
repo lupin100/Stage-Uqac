@@ -109,6 +109,20 @@ class PersonController extends AbstractController
         return $this->json($data, Response::HTTP_OK);
     }
 
+    #[Route('/{id}/students', name: 'api_person_students', methods: ['GET'])]
+    public function getSupervisedStudents(int $id, PersonRepository $personRepository): JsonResponse
+    {
+        $supervisor = $personRepository->find($id);
+        
+        if (!$supervisor) {
+            return $this->json(['error' => 'Membre introuvable'], 404);
+        }
+
+        $students = $personRepository->findStudentsBySupervisor($id);
+
+        return $this->json($students);
+    }
+
     /**
      * GET : Filtrer les membres par rôle de manière générique
      */

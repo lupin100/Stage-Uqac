@@ -3,11 +3,32 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { breadcrumbStore } from '../main.js'
 import defaultAvatar from '../assets/default-avatar.png'
+import TableComponent from '../components/Tableau.vue'
 
 const route = useRoute()
 const person = ref(null)
 const isLoading = ref(true)
 const errorMessage = ref(null)
+
+const studentsList = ref([])
+
+const studentHeaders = [
+  { title: 'Étudiant(e)s', key: 'fullName' },
+  { title: 'Statut', key: 'degree' },
+  { title: 'Sujets', key: 'topic' },
+]
+
+const currentStudents = computed(() =>
+  studentsList.value
+    .filter(s => s.role === 'Etudiant')
+    .map(s => ({ ...s, fullName: `${s.lastName}, ${s.firstName}` }))
+)
+
+const formerStudents = computed(() =>
+  studentsList.value
+    .filter(s => s.role === 'Ancien étudiant')
+    .map(s => ({ ...s, fullName: `${s.lastName}, ${s.firstName}` }))
+)
 
 const isStudentProfile = computed(() => {
   const role = person.value?.role
@@ -24,6 +45,11 @@ const fetchPersonDetail = async () => {
 
     // Mise à jour du fil d'Ariane
     breadcrumbStore.dynamicTitle = `${data.firstName} ${data.lastName}`
+
+    const resStudents = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/${route.params.id}/students`)
+    if (resStudents.ok) {
+      studentsList.value = await resStudents.json()
+    }
 
   } catch (error) {
     errorMessage.value = "Impossible de charger le profil."
@@ -122,19 +148,11 @@ onMounted(fetchPersonDetail)
               </p>
 
               <p class="mb-1 text-grey-darken-1">
-                {{ person.institution?.name || 'Institution non précisée' }}
+                {{ person.institutions?.[0]?.name || 'Institution non précisée' }}
               </p>
 
-              <v-btn
-                v-if="person.personalPageUrl"
-                :href="person.personalPageUrl"
-                target="_blank"
-                variant="outlined"
-                color="primary"
-                size="small"
-                class="mt-4"
-                prepend-icon="mdi-web"
-              >
+              <v-btn v-if="person.personalPageUrl" :href="person.personalPageUrl" target="_blank" variant="outlined"
+                color="primary" size="small" class="mt-4" prepend-icon="mdi-web">
                 Page personnelle
               </v-btn>
             </div>
@@ -160,6 +178,46 @@ onMounted(fetchPersonDetail)
             {{ person.biography || "Aucune biographie disponible pour le moment." }}
           </div>
         </div>
+        <v-expansion-panels class="mt-6" variant="separated" multiple>
+
+          <v-expansion-panel v-if="currentStudents.length > 0">
+            <v-expansion-panel-title class="text-h6 font-weight-bold">
+              Étudiant(e)s actuel(le)s
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <TableComponent :headers="studentHeaders" :items="currentStudents" item-value="id_person">
+                <template #item.fullName="{ item }">
+                  <router-link :to="`/person/${item.id_person}`"
+                    class="text-primary text-decoration-none font-weight-medium">
+                    {{ item.fullName }}
+                  </router-link>
+                </template>
+
+                <template #item.degree="{ item }">
+                  {{ item.degree }} <span v-if="item.startYear" class="text-grey text-caption">(Depuis {{ item.startYear
+                    }})</span>
+                </template>
+              </TableComponent>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel v-if="formerStudents.length > 0" class="mt-4">
+            <v-expansion-panel-title class="text-h6 font-weight-bold">
+              Ancien(ne)s étudiant(e)s
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <TableComponent :headers="studentHeaders" :items="formerStudents" item-value="id_person">
+                <template #item.fullName="{ item }">
+                  <router-link :to="`/person/${item.id_person}`"
+                    class="text-primary text-decoration-none font-weight-medium">
+                    {{ item.fullName }}
+                  </router-link>
+                </template>
+              </TableComponent>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+        </v-expansion-panels>
       </template>
     </div>
   </v-container>
