@@ -16,7 +16,7 @@ const isStudentProfile = computed(() => {
 
 const fetchPersonDetail = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/${route.params.id}`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/details/${route.params.id}`)
     if (!response.ok) throw new Error('Membre introuvable')
 
     const data = await response.json()
@@ -58,11 +58,16 @@ onMounted(fetchPersonDetail)
         <v-col cols="12" md="8">
           <!-- Affichage étudiant/ancien étudiant -->
           <template v-if="isStudentProfile">
-            <div class="info-header mb-4">
+            <div class="info-header mb-2">
               <h3 class="text-h5 font-weight-bold">
                 Directeur :
                 {{ person.studentProfile?.supervisor?.firstName || '' }}
                 {{ person.studentProfile?.supervisor?.lastName || 'Non précisé' }}
+              </h3>
+              <h3 class="text-h5 font-weight-bold">
+                Co-Directeur :
+                {{ person.studentProfile?.coSupervisor?.firstName }}
+                {{ person.studentProfile?.coSupervisor?.lastName }}
               </h3>
               <v-divider class="border-opacity-50 my-2" />
             </div>
@@ -86,7 +91,7 @@ onMounted(fetchPersonDetail)
               </p>
 
               <p class="mb-1 text-grey-darken-1">
-                {{ person.institutions?.[0]?.name || 'Institution non précisée' }}
+                {{ person.institution?.name || 'Institution non précisée' }}
               </p>
             </div>
           </template>
@@ -106,7 +111,7 @@ onMounted(fetchPersonDetail)
               </p>
 
               <p class="mb-1 text-grey-darken-1">
-                {{ person.departements?.[0]?.name || 'Département non précisé' }}
+                {{ person.departement?.name || 'Département non précisé' }}
               </p>
 
               <p class="mb-1">
@@ -117,7 +122,7 @@ onMounted(fetchPersonDetail)
               </p>
 
               <p class="mb-1 text-grey-darken-1">
-                {{ person.institutions?.[0]?.name || 'Institution non précisée' }}
+                {{ person.institution?.name || 'Institution non précisée' }}
               </p>
 
               <v-btn

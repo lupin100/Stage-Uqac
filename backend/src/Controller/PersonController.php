@@ -57,6 +57,58 @@ class PersonController extends AbstractController
         ], Response::HTTP_OK, [], ['groups' => 'person:read']);
     }
 
+    #[Route('/details/{id}', name: 'app_person_details', methods: ['GET'])]
+    public function details(int $id, PersonRepository $repository): JsonResponse
+    {
+        $person = $repository->findDetailedPersonById($id);
+
+        if (!$person) {
+            return $this->json(['error' => 'Personne introuvable'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = [
+            'id' => $person['id'],
+            'firstName' => $person['firstName'],
+            'lastName' => $person['lastName'],
+            'email' => $person['email'],
+            'photoPath' => $person['photoPath'],
+            'jobTitle' => $person['jobTitle'],
+            'personalPageUrl' => $person['personalPageUrl'],
+            'biography' => $person['biography'],
+            'role' => $person['role'],
+
+            'institution' => [
+                'name' => $person['institution_name'] ?: null,
+            ],
+
+            'departement' => [
+                'name' => $person['departement_name'] ?: null,
+            ],
+
+            'studentProfile' => [
+                'id' => $person['studentProfileId'],
+                'topic' => $person['topic'],
+                'studentDegree' => [
+                    'degree' => $person['degree'],
+                    'startYear' => $person['start_year'],
+                    'endYear' => $person['end_year'],
+                ],
+                'supervisor' => [
+                    'id' => $person['supervisor_id'],
+                    'firstName' => $person['supervisor_first_name'],
+                    'lastName' => $person['supervisor_last_name'],
+                ],
+                'coSupervisor' => [
+                    'id' => $person['co_supervisor_id'],
+                    'firstName' => $person['co_supervisor_first_name'],
+                    'lastName' => $person['co_supervisor_last_name'],
+                ],
+            ],
+        ];
+
+        return $this->json($data, Response::HTTP_OK);
+    }
+
     /**
      * GET : Filtrer les membres par rôle de manière générique
      */
