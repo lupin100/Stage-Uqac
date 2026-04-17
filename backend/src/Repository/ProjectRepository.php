@@ -73,4 +73,14 @@ class ProjectRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function findDistinctThematics(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('DISTINCT p.thematic')
+            ->where('p.thematic IS NOT NULL')
+            ->orderBy('p.thematic', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

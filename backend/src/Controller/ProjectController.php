@@ -56,6 +56,18 @@ class ProjectController extends AbstractController
         ], Response::HTTP_OK, [], $context);
     }
 
+    #[Route('/thematics', name: 'app_project_thematics', methods: ['GET'])]
+    public function getThematics(ProjectRepository $repository): JsonResponse
+    {
+        $results = $repository->findDistinctThematics();
+        
+        // On transforme le tableau d'objets [['thematic' => 'Santé'], ...] 
+        // en un tableau simple de chaînes ['Santé', ...]
+        $thematics = array_column($results, 'thematic');
+
+        return $this->json($thematics);
+    }
+
     /**
      * POST : Créer un nouveau projet
      */
