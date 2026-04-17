@@ -107,18 +107,8 @@ const router = createRouter({
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Collaborateurs', to: '/membres-collabos' } ] }
     },
     {
-      path: '/admin-connexion', name: 'admin-connexion', component: ConnexionView, meta: {
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Admin', to: '/admin-connexion' } ] }
-    },
-    {
-      path: '/admin/dashboard', name: 'admin/dashboard', component: DashboardView, meta: {
-        requiresAuth: true,
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Admin', to: '/admin/dashboard' } ] }
-    },
-    {
       path: '/comites-scientifique-executif', name: 'comites-scientifique-executif', component: ComitesSciExecView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Comités scientifique et exécutif', to: '/comites-scientifique-executif' } ] }
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: '/:id' } ] }
     }
   ]
 })
