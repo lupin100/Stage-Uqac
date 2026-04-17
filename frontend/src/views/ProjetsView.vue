@@ -159,11 +159,6 @@ const resetFilters = () => {
                                 size="small">
                                 {{ project.isFinished ? 'Terminé' : 'En cours' }}
                             </v-chip>
-                            <v-spacer></v-spacer>
-                            <v-btn variant="text" color="primary" class="font-weight-bold"
-                                append-icon="mdi-arrow-right">
-                                Détails
-                            </v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-col>
