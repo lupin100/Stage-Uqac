@@ -13,7 +13,7 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    public function findEventsByFilters(?string $status, ?string $search, ?string $thematic = null, ?int $limit = null, ?int $offset = null): array
+    public function findEventsByFilters(?string $status, ?string $search, ?string $eventType = null, ?int $limit = null, ?int $offset = null): array
     {
         $qb = $this->createQueryBuilder('e');
         $now = new \DateTimeImmutable();
@@ -29,10 +29,10 @@ class EventRepository extends ServiceEntityRepository
             $qb->orderBy('e.startDate', 'DESC');
         }
 
-        // 2. Filtrage par Thématique
-        if ($thematic && $thematic !== 'all') {
-            $qb->andWhere('e.thematic = :thematic')
-               ->setParameter('thematic', $thematic);
+        // 2. Filtrage par Type d'événement (eventType)
+        if ($eventType && $eventType !== 'all') {
+            $qb->andWhere('e.eventType = :eventType')
+               ->setParameter('eventType', $eventType);
         }
 
         // 3. Recherche par mot-clé (Levenshtein)
@@ -50,7 +50,7 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countEventsByFilters(?string $status, ?string $search, ?string $thematic = null): int
+    public function countEventsByFilters(?string $status, ?string $search, ?string $eventType = null): int
     {
         $qb = $this->createQueryBuilder('e')->select('count(e.id)');
         $now = new \DateTimeImmutable();
@@ -61,9 +61,9 @@ class EventRepository extends ServiceEntityRepository
             $qb->andWhere('e.endDate < :now')->setParameter('now', $now);
         }
 
-        if ($thematic && $thematic !== 'all') {
-            $qb->andWhere('e.thematic = :thematic')
-               ->setParameter('thematic', $thematic);
+        if ($eventType && $eventType !== 'all') {
+            $qb->andWhere('e.eventType = :eventType')
+               ->setParameter('eventType', $eventType);
         }
 
         if ($search) {

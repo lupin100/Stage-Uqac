@@ -21,31 +21,32 @@ class EventController extends AbstractController
     {
         $status = $request->query->get('status');
         $search = $request->query->get('q');
-        $thematic = $request->query->get('thematic');
+        // On récupère "thematic" dans l'URL pour ton Front, mais on l'injecte dans eventType
+        $eventType = $request->query->get('thematic');
 
         $page = $request->query->get('page');
         $limit = (int) $request->query->get('limit', 10);
 
         if ($page === null) {
-            $events = $repository->findEventsByFilters($status, $search, $thematic);
+            $events = $repository->findEventsByFilters($status, $search, $eventType);
             return $this->json($events, Response::HTTP_OK);
         }
 
         $page = max(1, (int) $page);
         $offset = ($page - 1) * $limit;
 
-        $events = $repository->findEventsByFilters($status, $search, $thematic, $limit, $offset);
-        $total = $repository->countEventsByFilters($status, $search, $thematic);
+        $events = $repository->findEventsByFilters($status, $search, $eventType, $limit, $offset);
+        $total = $repository->countEventsByFilters($status, $search, $eventType);
 
         return $this->json([
             'data' => $events,
             'total' => $total,
             'page' => $page,
-            'last_page' => ceil($total / $limit),
+            'last_page' => (int) ceil($total / $limit),
             'filters' => [
                 'status' => $status,
                 'search' => $search,
-                'thematic' => $thematic
+                'thematic' => $eventType
             ]
         ], Response::HTTP_OK);
     }
