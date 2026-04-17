@@ -237,4 +237,8 @@ class Project
 
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->title;
+    }
 }

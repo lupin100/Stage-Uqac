@@ -106,4 +106,9 @@ class StudentProfile
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->person ? $this->person->getFirstName() . ' ' . $this->person->getLastName() : 'N/A';
+    }
 }

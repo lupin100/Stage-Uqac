@@ -108,4 +108,9 @@ class Institution
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->name ?? 'N/A';
+    }
 }
