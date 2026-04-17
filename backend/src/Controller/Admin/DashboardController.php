@@ -19,7 +19,8 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('GRI UQAC - Administration');
+            ->setTitle('GRI UQAC - Administration')
+            ->setFaviconPath('/images/favicon.svg');
     }
 
     public function configureMenuItems(): iterable
