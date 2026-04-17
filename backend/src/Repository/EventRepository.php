@@ -18,7 +18,6 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('e');
         $now = new \DateTimeImmutable();
 
-        // 1. Filtrage par Statut
         if ($status === 'upcoming') {
             $qb->andWhere('e.endDate > :now')->orderBy('e.startDate', 'ASC');
             $qb->setParameter('now', $now);
@@ -29,13 +28,11 @@ class EventRepository extends ServiceEntityRepository
             $qb->orderBy('e.startDate', 'DESC');
         }
 
-        // 2. Filtrage par Type d'événement (eventType)
         if ($eventType && $eventType !== 'all') {
             $qb->andWhere('e.eventType = :eventType')
                ->setParameter('eventType', $eventType);
         }
 
-        // 3. Recherche par mot-clé (Levenshtein)
         if ($search) {
             $qb->andWhere('LEVENSHTEIN(e.title, :searchQuery) <= 4 OR e.title LIKE :likeQuery')
                ->addSelect('LEVENSHTEIN(e.title, :searchQuery) as HIDDEN score')

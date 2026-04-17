@@ -19,35 +19,38 @@ class ProjectController extends AbstractController
     /**
      * GET ALL : Liste tous les projets
      */
-    #[Route('', name: 'app_project_index', methods: ['GET'])]
+   #[Route('', name: 'app_project_index', methods: ['GET'])]
     public function index(Request $request, ProjectRepository $repository): JsonResponse
     {
-        $page = $request->query->get('page');
+        $status = $request->query->get('status');
+        $thematic = $request->query->get('thematic');
+        $search = $request->query->get('q');         
 
+        $page = $request->query->get('page');
+        $limit = (int) $request->query->get('limit', 5);
 
         if ($page === null) {
-            return $this->json($repository->findAll(), Response::HTTP_OK);
+            $projects = $repository->findProjectsByFilters($status, $search, $thematic);
+            return $this->json($projects, Response::HTTP_OK);
         }
 
         $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 5)); // 5 projets par page par défaut
         $offset = ($page - 1) * $limit;
 
-        $projects = $repository->findBy(
-            [],
-            ['id' => 'DESC'], // On affiche les plus récents en premier
-            $limit,
-            $offset
-        );
-
-        $total = $repository->count([]);
+        $projects = $repository->findProjectsByFilters($status, $search, $thematic, $limit, $offset);
+        $total = $repository->countProjectsByFilters($status, $search, $thematic);
 
         return $this->json([
             'data'  => $projects,
+            'total' => $total,
             'page'  => $page,
             'limit' => $limit,
-            'total' => $total,
-            'last_page' => ceil($total / $limit)
+            'last_page' => ceil($total / $limit),
+            'filters' => [
+                'status' => $status,
+                'thematic' => $thematic,
+                'search' => $search
+            ]
         ]);
     }
 
@@ -56,8 +59,8 @@ class ProjectController extends AbstractController
      */
     #[Route('', name: 'app_project_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
@@ -92,15 +95,15 @@ class ProjectController extends AbstractController
      */
     #[Route('/{id}', name: 'app_project_update', methods: ['PATCH'])]
     public function update(
-        Project $project, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Project $project,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Project::class, 
-            'json', 
+            $request->getContent(),
+            Project::class,
+            'json',
             ['object_to_populate' => $project]
         );
 

@@ -21,7 +21,6 @@ class EventController extends AbstractController
     {
         $status = $request->query->get('status');
         $search = $request->query->get('q');
-        // On récupère "thematic" dans l'URL pour ton Front, mais on l'injecte dans eventType
         $eventType = $request->query->get('thematic');
 
         $page = $request->query->get('page');
