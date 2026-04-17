@@ -87,9 +87,9 @@ const breadcrumbs = computed(() => {
           <v-menu activator="parent">
             <v-list>
               <v-list-item title="Membres réguliers" to="/membres-reguliers" />
-              <v-list-item title="Membres associé.e.s" to="/membres/2" />
-              <v-list-item title="Membres émérites" to="/membres/3" />
-              <v-list-item title="Collaborateurs" to="/membres/4" />
+              <v-list-item title="Membres associé.e.s" to="/membres-associes" />
+              <v-list-item title="Membres émérites" to="/membres-emerites" />
+              <v-list-item title="Collaborateurs" to="/membres-collabos" />
               <v-list-item title="Étudiant.e.s" to="/membres/5" />
               <v-list-item title="Ancien.ne.s étudiant.e.s" to="/membres/6" />
             </v-list>

@@ -22,50 +22,31 @@ class PersonController extends AbstractController
     #[Route('', name: 'app_person_index', methods: ['GET'])]
     public function index(Request $request, PersonRepository $repository): JsonResponse
     {
-        $page = $request->query->get('page');
-        $role = $request->query->get('role'); // On récupère le rôle s'il est fourni
 
-        $criteria = [];
-        if ($role) {
-            $criteria['role'] = $role;
-        }
-
-        if ($page === null) {
-            $persons = $repository->findBy($criteria, ['lastName' => 'ASC']);
-            return $this->json($persons, Response::HTTP_OK, [], ['groups' => 'person:read']);
-        }
-
-        $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 6));
-        $offset = ($page - 1) * $limit;
-
-        $persons = $repository->findBy(
-            $criteria,
-            ['lastName' => 'ASC'],
-            $limit,
-            $offset
-        );
-
-        $total = $repository->count($criteria);
-
-        return $this->json([
-            'data' => $persons,
-            'page' => $page,
-            'limit' => $limit,
-            'total' => $total,
-            'last_page' => ceil($total / $limit)
-        ], Response::HTTP_OK, [], ['groups' => 'person:read']);
+        $persons = $repository->findBy(['lastName' => 'ASC']);
+        return $this->json($persons, Response::HTTP_OK, [], ['groups' => 'person:read']);
     }
 
     /**
-     * GET : Liste des membres du comité exécutif
+     * GET : Filtrer les membres par rôle de manière générique
      */
-    #[Route('/executive-committee', name: 'app_person_executive_committee', methods: ['GET'])]
-    public function getExecutiveCommittee(PersonRepository $repository): JsonResponse
+    #[Route('/filter/{role}', name: 'app_person_filter_by_role', methods: ['GET'])]
+    public function getByRole(string $role, PersonRepository $repository): JsonResponse
     {
-        // On utilise directement le cas de l'Enum pour filtrer
+        // On tente de convertir la chaîne de l'URL en cas de l'Enum
+        // Ex: "Membre associé" deviendra PersonEnum::MEMBRE_ASSOCIE
+        $enumRole = \App\Enum\PersonEnum::tryFrom($role);
+
+        if (!$enumRole) {
+            return $this->json([
+                'error' => 'Rôle non valide',
+                'received' => $role,
+                'available_roles' => array_column(\App\Enum\PersonEnum::cases(), 'value')
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
         $members = $repository->findBy(
-            ['role' => \App\Enum\PersonEnum::MEMBRE_REGULIER_COMMITE],
+            ['role' => $enumRole],
             ['lastName' => 'ASC']
         );
 

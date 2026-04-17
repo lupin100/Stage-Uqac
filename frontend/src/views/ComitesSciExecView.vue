@@ -11,7 +11,10 @@ const fetchCommittee = async () => {
     isLoading.value = true
     errorMessage.value = null
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/executive-committee`)
+        const filter = encodeURIComponent('Membre régulier du comité exécutif')
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/persons/filter/${filter}`
+        )
 
         if (!response.ok) throw new Error('Erreur réseau')
 

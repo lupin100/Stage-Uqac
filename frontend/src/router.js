@@ -20,6 +20,9 @@ import ConnexionView from './views/admin/ConnexionView.vue'
 import DashboardView from './views/admin/DashboardView.vue'
 import ConseilStrategiqueView from './views/ConseilStrategiqueView.vue'
 import ComitesSciExecView from './views/ComitesSciExecView.vue'
+import MembresAssociesView from './views/MembresAssociesView.vue'
+import MembresEmeritesView from './views/MembresEmeritesView.vue'
+import MembresCollabosView from './views/MembresCollabosView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -91,7 +94,19 @@ const router = createRouter({
     },
     {
       path: '/membres/:id', name: 'membre', component: MembreCollaboView, meta: {
-        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres réguliers', to: '/membres-reguliers' }, { title: '/:id' } ] }
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Détails' }, { title: '/:id' } ] }
+    },
+    {
+      path: '/membres-associes', name: 'membres-associes', component: MembresAssociesView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres associés', to: '/membres-associes' } ] } 
+    },
+    {
+      path: '/membres-emerites', name: 'membres-emerites', component: MembresEmeritesView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Membres émérites', to: '/membres-emerites' } ] }
+    },
+    {
+      path: '/membres-collabos', name: 'membres-collabos', component: MembresCollabosView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Collaborateurs', to: '/membres-collabos' } ] }
     },
     {
       path: '/admin-connexion', name: 'admin-connexion', component: ConnexionView, meta: {
