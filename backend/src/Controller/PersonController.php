@@ -58,6 +58,21 @@ class PersonController extends AbstractController
     }
 
     /**
+     * GET : Liste des membres du comité exécutif
+     */
+    #[Route('/executive-committee', name: 'app_person_executive_committee', methods: ['GET'])]
+    public function getExecutiveCommittee(PersonRepository $repository): JsonResponse
+    {
+        // On utilise directement le cas de l'Enum pour filtrer
+        $members = $repository->findBy(
+            ['role' => \App\Enum\PersonEnum::MEMBRE_REGULIER_COMMITE],
+            ['lastName' => 'ASC']
+        );
+
+        return $this->json($members, Response::HTTP_OK, [], ['groups' => 'person:read']);
+    }
+
+    /**
      * POST : Créer une nouvelle personne
      */
     #[Route('', name: 'app_person_create', methods: ['POST'])]
