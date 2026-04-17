@@ -111,6 +111,7 @@ class AppFixtures extends Fixture
 
         // --- Projects ---
         $projectEnums = ProjectEnum::cases();
+        $projects = []; // Ajout d'un tableau pour les stocker
         for ($i = 0; $i < 15; $i++) {
             $project = new Project();
             $project->setTitle('Projet : ' . $faker->randomElement($itSubjects));
@@ -120,17 +121,16 @@ class AppFixtures extends Fixture
             $project->setThematic($faker->randomElement($projectEnums));
 
             $manager->persist($project);
+            $projects[] = $project;
         }
 
         // --- Persons ---
         $personEnums = PersonEnum::cases();
-        $availableDepartements = $departements;
-        $availableInstitutions = $institutions;
         $persons = [];
         $students = [];
         $members = [];
 
-        for ($i = 0; $i < 150; $i++) {
+        for ($i = 0; $i < 300; $i++) {
             $person = new Person();
             $person->setFirstName($faker->firstName());
             $person->setLastName($faker->lastName());
@@ -145,11 +145,18 @@ class AppFixtures extends Fixture
             $role = $faker->randomElement($personEnums);
             $person->setRole($role);
 
-            if (!empty($availableDepartements) && $faker->boolean(30)) {
-                $person->setDepartement(array_pop($availableDepartements));
+            if (!empty($departements)) {
+                $randomDep = $faker->optional(0.9)->randomElement($departements);
+                if ($randomDep) {
+                    $person->addDepartement($randomDep);
+                }
             }
-            if (!empty($availableInstitutions) && $faker->boolean(30)) {
-                $person->setInstitution(array_pop($availableInstitutions));
+            
+            if (!empty($institutions)) {
+                $randomInst = $faker->optional(0.9)->randomElement($institutions);
+                if ($randomInst) {
+                    $person->addInstitution($randomInst);
+                }
             }
 
             $manager->persist($person);
@@ -166,9 +173,9 @@ class AppFixtures extends Fixture
         // --- StudentDegrees ---
         $degreeEnums = StudentDegreeEnum::cases();
         $studentDegrees = [];
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $degree = new StudentDegree();
-            $startYear = $faker->numberBetween(2018, 2023);
+            $startYear = $faker->numberBetween(2018, 2025);
 
             $degree->setStartYear($startYear);
             $degree->setEndYear($startYear + $faker->numberBetween(1, 3));
@@ -184,7 +191,7 @@ class AppFixtures extends Fixture
         shuffle($availableStudents);
 
         // on s'assure de ne pas dépasser le nombre d'étudiants disponibles pour éviter les erreurs de fixtures
-        $numberOfProfiles = min(40, count($students));
+        $numberOfProfiles = min(80, count($students));
 
         for ($i = 0; $i < $numberOfProfiles; $i++) {
             $profile = new StudentProfile();
@@ -221,6 +228,13 @@ class AppFixtures extends Fixture
                 $contributor->setDisplayName($linkedPerson->getFirstName() . ' ' . $linkedPerson->getLastName());
             }
 
+            if (!empty($projects)) {
+                $nbProjects = $faker->numberBetween(0, 3);
+                for ($j = 0; $j < $nbProjects; $j++) {
+                    $contributor->addProject($faker->randomElement($projects));
+                }
+            }
+
             $manager->persist($contributor);
             $contributors[] = $contributor;
         }
@@ -234,17 +248,15 @@ class AppFixtures extends Fixture
             $publication->setTitle($title)
                         ->setYear($faker->numberBetween(2016, 2024))
                         ->setExternalUrl($faker->optional(0.7)->url())
-                        ->setPublicationType($faker->randomElement($publicationEnums))
-                        ->setContributor($faker->randomElement($contributors));
+                        ->setPublicationType($faker->randomElement($publicationEnums));
+            
+            $nbContributors = $faker->numberBetween(1, 4);
+            for ($j = 0; $j < $nbContributors; $j++) {
+                $publication->addContributor($faker->randomElement($contributors));
+            }
 
             $manager->persist($publication);
         }
-
-        // USER DE TEST
-        $testUser = new User();
-        $testUser->setEmail('test');
-        $testUser->setPassword('test');
-        $manager->persist($testUser);
 
         $manager->flush();
     }
