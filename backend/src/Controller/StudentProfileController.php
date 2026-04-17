@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Enum\PersonEnum;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[Route('/api/student-profiles')]
 class StudentProfileController extends AbstractController
@@ -25,6 +27,20 @@ class StudentProfileController extends AbstractController
         return $this->json($repository->findAll(), Response::HTTP_OK, [], [
             'groups' => 'student:read'
         ]);
+    }
+
+    #[Route('/details/{type}', name: 'app_student_profile_details', methods: ['GET'])]
+    public function detailsByType(string $type, StudentProfileRepository $repository): JsonResponse
+    {
+        $role = match ($type) {
+            'etudiants' => PersonEnum::ETUDIANT,
+            'anciens-etudiants' => PersonEnum::ANCIEN_ETUDIANT,
+            default => throw new BadRequestHttpException('Type invalide. Utilise "etudiants" ou "anciens-etudiants".'),
+        };
+
+        $data = $repository->findDetailedByPersonRole($role);
+
+        return $this->json($data, Response::HTTP_OK);
     }
 
     /**

@@ -16,6 +16,33 @@ class StudentProfileRepository extends ServiceEntityRepository
         parent::__construct($registry, StudentProfile::class);
     }
 
+    public function findDetailedByPersonRole(\App\Enum\PersonEnum $role): array
+    {
+        return $this->createQueryBuilder('sp')
+            ->leftJoin('sp.person', 'p')
+            ->leftJoin('p.institutions', 'i')
+            ->leftJoin('sp.supervisor', 's')
+            ->leftJoin('sp.coSupervisor', 'cs')
+            ->leftJoin('sp.studentDegree', 'sd')
+            ->andWhere('p.role = :role')
+            ->setParameter('role', $role)
+            ->select([
+                'p.id AS id',
+                "CONCAT(p.lastName, ', ', p.firstName) AS nom",
+                'i.name AS universite',
+                'sd.degree AS statut',
+                "CONCAT(s.lastName, ', ', s.firstName) AS directeur",
+                "CONCAT(cs.lastName, ', ', cs.firstName) AS coSuperviseur",
+                'sp.topic AS topic',
+                'sd.startYear AS start_year',
+                'sd.endYear AS end_year',
+            ])
+            ->orderBy('p.lastName', 'ASC')
+            ->addOrderBy('p.firstName', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return StudentProfile[] Returns an array of StudentProfile objects
     //     */
