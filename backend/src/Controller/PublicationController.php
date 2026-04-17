@@ -54,6 +54,34 @@ class PublicationController extends AbstractController
         ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
     }
 
+    #[Route('/details', name: 'app_publication_details', methods: ['GET'])]
+    public function getDetails(Request $request, PublicationRepository $repository): JsonResponse
+    {
+        $page = $request->query->get('page');
+
+        // Pas de pagination : on récupère tout avec les détails
+        if ($page === null) {
+            $publications = $repository->findAllWithDetails();
+            return $this->json($publications, Response::HTTP_OK, [], ['groups' => 'publication:read']);
+        }
+
+        // Avec pagination
+        $page = max(1, (int) $page);
+        $limit = max(1, (int) $request->query->get('limit', 10));
+        $offset = ($page - 1) * $limit;
+
+        // On passe les arguments à la méthode qui les accepte maintenant
+        $publications = $repository->findAllWithDetails($limit, $offset);
+        $total = $repository->count([]);
+
+        return $this->json([
+            'data' => $publications,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total
+        ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
+    }
+
     /**
      * POST : Créer une publication
      */
