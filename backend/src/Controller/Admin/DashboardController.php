@@ -43,6 +43,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ContributorCrudController::class, 'Contributeurs', 'fas fa-pen-fancy');
 
         yield MenuItem::section('Comptes Administrateurs');
-        yield MenuItem::linkTo(UserCrudController::class, 'Utilisateurs', 'fas fa-user-lock');
+        yield MenuItem::linkTo(UserCrudController::class, 'Administrateurs', 'fas fa-user-lock');
     }
 }

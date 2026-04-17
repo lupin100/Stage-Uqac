@@ -113,6 +113,7 @@ class StudentDegree
 
     public function __toString(): string
     {
-        return $this->degree ? $this->degree->name : 'N/A' . ' (' . ($this->startYear ?? 'N/A') . ' - ' . ($this->endYear ?? 'N/A') . ')';
+        $degreeName = $this->degree ? $this->degree->value : 'N/A';
+        return $degreeName . ' (' . ($this->startYear ?? 'N/A') . ' - ' . ($this->endYear ?? 'En cours') . ')';
     }
 }
