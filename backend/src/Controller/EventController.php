@@ -19,46 +19,48 @@ class EventController extends AbstractController
     #[Route('', name: 'app_event_index', methods: ['GET'])]
     public function index(Request $request, EventRepository $repository): JsonResponse
     {
-        $page = $request->query->get('page');
+        $status = $request->query->get('status');
+        $search = $request->query->get('q');
+        $thematic = $request->query->get('thematic');
 
-        // pas de page précisé -> envoie toutes les données
+        $page = $request->query->get('page');
+        $limit = (int) $request->query->get('limit', 10);
+
         if ($page === null) {
-            $events = $repository->findBy([], ['startDate' => 'DESC']);
+            $events = $repository->findEventsByFilters($status, $search, $thematic);
             return $this->json($events, Response::HTTP_OK);
         }
 
-        // avec page spec -> pagination
         $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 10));
         $offset = ($page - 1) * $limit;
 
-        $events = $repository->findBy(
-            [],
-            ['startDate' => 'DESC'],
-            $limit,
-            $offset
-        );
-
-        $total = $repository->count([]);
+        $events = $repository->findEventsByFilters($status, $search, $thematic, $limit, $offset);
+        $total = $repository->countEventsByFilters($status, $search, $thematic);
 
         return $this->json([
             'data' => $events,
+            'total' => $total,
             'page' => $page,
-            'limit' => $limit,
-            'total' => $total
-        ]);
+            'last_page' => ceil($total / $limit),
+            'filters' => [
+                'status' => $status,
+                'search' => $search,
+                'thematic' => $thematic
+            ]
+        ], Response::HTTP_OK);
     }
+
 
     #[Route('', name: 'app_event_create', methods: ['POST'])]
     public function create(
-        Request $request, 
-        SerializerInterface $serializer, 
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em,
         ValidatorInterface $validator
     ): JsonResponse {
         try {
             $event = $serializer->deserialize($request->getContent(), Event::class, 'json');
-            
+
             $errors = $validator->validate($event);
             if (count($errors) > 0) {
                 return $this->json($errors, Response::HTTP_BAD_REQUEST);
@@ -81,15 +83,15 @@ class EventController extends AbstractController
 
     #[Route('/{id}', name: 'app_event_update', methods: ['PATCH'])]
     public function update(
-        Event $event, 
-        Request $request, 
-        SerializerInterface $serializer, 
+        Event $event,
+        Request $request,
+        SerializerInterface $serializer,
         EntityManagerInterface $em
     ): JsonResponse {
         $serializer->deserialize(
-            $request->getContent(), 
-            Event::class, 
-            'json', 
+            $request->getContent(),
+            Event::class,
+            'json',
             ['object_to_populate' => $event]
         );
 

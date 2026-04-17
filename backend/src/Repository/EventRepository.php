@@ -6,9 +6,6 @@ use App\Entity\Event;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Event>
- */
 class EventRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,65 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-//    /**
-//     * @return Event[] Returns an array of Event objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findEventsByFilters(?string $status, ?string $search, ?string $thematic = null, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $now = new \DateTimeImmutable();
 
-//    public function findOneBySomeField($value): ?Event
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        // 1. Filtrage par Statut
+        if ($status === 'upcoming') {
+            $qb->andWhere('e.endDate > :now')->orderBy('e.startDate', 'ASC');
+            $qb->setParameter('now', $now);
+        } elseif ($status === 'past') {
+            $qb->andWhere('e.endDate < :now')->orderBy('e.startDate', 'DESC');
+            $qb->setParameter('now', $now);
+        } else {
+            $qb->orderBy('e.startDate', 'DESC');
+        }
+
+        // 2. Filtrage par Thématique
+        if ($thematic && $thematic !== 'all') {
+            $qb->andWhere('e.thematic = :thematic')
+               ->setParameter('thematic', $thematic);
+        }
+
+        // 3. Recherche par mot-clé (Levenshtein)
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(e.title, :searchQuery) <= 4 OR e.title LIKE :likeQuery')
+               ->addSelect('LEVENSHTEIN(e.title, :searchQuery) as HIDDEN score')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%')
+               ->orderBy('score', 'ASC');
+        }
+
+        if ($limit) $qb->setMaxResults($limit);
+        if ($offset) $qb->setFirstResult($offset);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countEventsByFilters(?string $status, ?string $search, ?string $thematic = null): int
+    {
+        $qb = $this->createQueryBuilder('e')->select('count(e.id)');
+        $now = new \DateTimeImmutable();
+
+        if ($status === 'upcoming') {
+            $qb->andWhere('e.endDate > :now')->setParameter('now', $now);
+        } elseif ($status === 'past') {
+            $qb->andWhere('e.endDate < :now')->setParameter('now', $now);
+        }
+
+        if ($thematic && $thematic !== 'all') {
+            $qb->andWhere('e.thematic = :thematic')
+               ->setParameter('thematic', $thematic);
+        }
+
+        if ($search) {
+            $qb->andWhere('LEVENSHTEIN(e.title, :searchQuery) <= 4 OR e.title LIKE :likeQuery')
+               ->setParameter('searchQuery', $search)
+               ->setParameter('likeQuery', '%'.$search.'%');
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }
