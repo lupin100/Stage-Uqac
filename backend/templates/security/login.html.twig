@@ -5,17 +5,39 @@
     <title>Connexion Administration</title>
     <style>
         body { font-family: sans-serif; background: #f5f7fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 300px; }
-        input[type="email"], input[type="password"] { margin-bottom: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 0.5rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        .alert { color: #721c24; background-color: #f8d7da; padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.9rem; }
+        form { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; flex-direction: column; width: 320px; }
+        
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; color: #1a202c; font-weight: 700; }
+        label { font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 0.5rem; }
+        
+        input[type="email"], input[type="password"] { 
+            margin-bottom: 1.25rem; padding: 0.625rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem;
+        }
+        input:focus { outline: 2px solid #007bff; border-color: transparent; }
+
+        /* Style de base des boutons */
+        .btn { 
+            padding: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; 
+            font-size: 0.95rem; text-align: center; text-decoration: none; transition: all 0.2s;
+            display: block; width: 100%; box-sizing: border-box;
+        }
+
+        /* Bouton de connexion (Bleu) */
+        .btn-primary { background: #007bff; color: white; margin-bottom: 0.75rem; }
+        .btn-primary:hover { background: #0056b3; transform: translateY(-1px); }
+
+        /* Bouton de retour (Gris) */
+        .btn-secondary { background: #edf2f7; color: #4a5568; }
+        .btn-secondary:hover { background: #e2e8f0; color: #2d3748; }
+
+        .alert { color: #c53030; background-color: #fff5f5; padding: 0.75rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.875rem; border: 1px solid #feb2b2; }
+        .remember-me { margin-bottom: 1.5rem; font-size: 0.875rem; color: #718096; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <form method="post">
-        <h1 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; color: #333;">Accès Admin</h1>
+        <h1>Accès Admin</h1>
 
         {% if error %}
             <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -29,13 +51,16 @@
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: #555;">
-            <label>
-                <input type="checkbox" name="_remember_me"> Se souvenir de moi
-            </label>
-        </div>
+        <label class="remember-me">
+            <input type="checkbox" name="_remember_me"> Se souvenir de moi
+        </label>
 
-        <button type="submit">Se connecter</button>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+
+        {# Bouton de retour vers le front #}
+        <a href="{{ frontend_url }}" class="btn btn-secondary">
+            ← Retour au site
+        </a>
     </form>
 
 </body>
