@@ -22,31 +22,35 @@ class PublicationController extends AbstractController
     #[Route('', name: 'app_publication_index', methods: ['GET'])]
     public function index(Request $request, PublicationRepository $repository): JsonResponse
     {
+        $year = $request->query->get('year') ? (int) $request->query->get('year') : null;
+        $type = $request->query->get('type');
+        $search = $request->query->get('q');
+
         $page = $request->query->get('page');
+        $limit = max(1, (int) $request->query->get('limit', 10));
 
         if ($page === null) {
-            $publications = $repository->findBy([], ['year' => 'DESC']);
+            $publications = $repository->findPublicationsByFilters($year, $type, $search);
             return $this->json($publications, Response::HTTP_OK, [], ['groups' => 'publication:read']);
         }
 
         $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 10));
         $offset = ($page - 1) * $limit;
 
-        $publications = $repository->findBy(
-            [],
-            ['year' => 'DESC'],
-            $limit,
-            $offset
-        );
-
-        $total = $repository->count([]);
+        $publications = $repository->findPublicationsByFilters($year, $type, $search, $limit, $offset);
+        $total = $repository->countPublicationsByFilters($year, $type, $search);
 
         return $this->json([
             'data' => $publications,
+            'total' => $total,
             'page' => $page,
             'limit' => $limit,
-            'total' => $total
+            'last_page' => ceil($total / $limit),
+            'filters' => [
+                'year' => $year,
+                'type' => $type,
+                'search' => $search
+            ]
         ], Response::HTTP_OK, [], ['groups' => 'publication:read']);
     }
 
