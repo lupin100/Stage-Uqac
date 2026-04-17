@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Publication;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @extends ServiceEntityRepository<Publication>
@@ -16,9 +17,14 @@ class PublicationRepository extends ServiceEntityRepository
         parent::__construct($registry, Publication::class);
     }
 
-    public function findPublicationsByFilters(?int $year, ?string $type, ?string $search, ?int $limit = null, ?int $offset = null): array
+    public function findPublicationsByFilters(?int $year, ?string $type, ?string $search, ?int $limit = null, ?int $offset = null): Paginator
     {
-        $qb = $this->createQueryBuilder('p');
+        $qb = $this->createQueryBuilder('p')
+        ->leftJoin('p.contributors', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.person', 'pers')
+            ->addSelect('pers')
+            ->orderBy('p.year', 'DESC');
 
         if ($year) {
             $qb->andWhere('p.year = :year')
@@ -44,7 +50,11 @@ class PublicationRepository extends ServiceEntityRepository
         if ($limit) $qb->setMaxResults($limit);
         if ($offset) $qb->setFirstResult($offset);
 
-        return $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+
+        $paginator = new Paginator($query, true);
+
+        return $paginator;
     }
 
     public function countPublicationsByFilters(?int $year, ?string $type, ?string $search): int
@@ -68,23 +78,23 @@ class PublicationRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function findAllWithDetails(?int $limit = null, ?int $offset = null): array
+        public function findDistinctYears(): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->leftJoin('p.contributor', 'c')
-            ->addSelect('c')
-            ->leftJoin('c.person', 'pers')
-            ->addSelect('pers')
-            ->orderBy('p.year', 'DESC');
+        return $this->createQueryBuilder('p')
+            ->select('DISTINCT p.year')
+            ->where('p.year IS NOT NULL')
+            ->orderBy('p.year', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
-        // On applique la limite et l'offset s'ils sont fournis
-        if ($limit !== null) {
-            $qb->setMaxResults($limit);
-        }
-        if ($offset !== null) {
-            $qb->setFirstResult($offset);
-        }
-
-        return $qb->getQuery()->getResult();
+    public function findDistinctTypes(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('DISTINCT p.publicationType')
+            ->where('p.publicationType IS NOT NULL')
+            ->orderBy('p.publicationType', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
