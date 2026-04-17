@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import defaultAvatar from '../assets/default-avatar.png'
 
+// États des données
 const members = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
@@ -9,32 +10,24 @@ const errorMessage = ref(null)
 const fetchMembers = async () => {
     isLoading.value = true
     errorMessage.value = null
-    
     try {
-        // Préparation des URLs
-        const urlRegulier = `${import.meta.env.VITE_API_URL}/api/persons/filter/${encodeURIComponent('Membre régulier')}`
-        const urlComite = `${import.meta.env.VITE_API_URL}/api/persons/filter/${encodeURIComponent('Membre régulier du comité exécutif')}`
+        const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/persons/filter/${encodeURIComponent('Collaborateur')}`
+        )
 
-        // On lance les deux requêtes en parallèle pour gagner du temps
-        const [resReguliers, resComite] = await Promise.all([
-            fetch(urlRegulier),
-            fetch(urlComite)
-        ])
+        if (!response.ok) throw new Error('Erreur réseau')
 
-        if (!resReguliers.ok || !resComite.ok) throw new Error('Erreur lors de la récupération des données')
+        const responseData = await response.json()
 
-        const dataReguliers = await resReguliers.json()
-        const dataComite = await resComite.json()
-
-        // Extraction des tableaux (gestion du format { data: [] } ou directement [])
-        const list1 = Array.isArray(dataReguliers) ? dataReguliers : (dataReguliers.data || [])
-        const list2 = Array.isArray(dataComite) ? dataComite : (dataComite.data || [])
-
-        // On fusionne les deux listes
-        members.value = [...list1, ...list2]
+        // On gère les deux formats de réponse possibles du backend
+        if (responseData.data) {
+            members.value = responseData.data
+        } else {
+            members.value = responseData
+        }
 
     } catch (error) {
-        errorMessage.value = "Impossible de charger les membres."
+        errorMessage.value = "Impossible de charger les collaborateurs."
         console.error(error)
     } finally {
         isLoading.value = false
@@ -46,7 +39,7 @@ onMounted(fetchMembers)
 
 <template>
     <v-container class="py-10" max-width="1200">
-        <h2 class="text-h4 font-weight-bold mb-8 color-title">Membres réguliers</h2>
+        <h2 class="text-h4 font-weight-bold mb-8 color-title">Collaborateurs</h2>
 
         <div v-if="isLoading" class="text-center py-10">
             <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
@@ -57,7 +50,7 @@ onMounted(fetchMembers)
         </v-alert>
 
         <div v-else>
-            <v-row v-if="members && members.length > 0">
+            <v-row v-if="members.length > 0">
                 <v-col v-for="person in members" :key="person.id" cols="12" sm="6" class="mb-6">
                     <div class="d-flex align-start">
                         <router-link :to="{ name: 'membre', params: { id: person.id } }">
@@ -83,8 +76,8 @@ onMounted(fetchMembers)
                 </v-col>
             </v-row>
 
-            <v-empty-state v-else icon="mdi-account-off-outline" title="Aucun membre trouvé"
-                text="La base de données ne contient aucun membre régulier pour le moment.">
+            <v-empty-state v-if="members.length === 0" icon="mdi-account-off-outline" title="Aucun collaborateur trouvé"
+                text="La base de données ne contient aucun collaborateur pour le moment.">
             </v-empty-state>
         </div>
     </v-container>

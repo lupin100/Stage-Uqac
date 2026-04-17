@@ -24,10 +24,6 @@
                         Saguenay, QC, G7H 2B1
                     </p>
 
-                    <p class="text-body-1 mb-4">
-                        Local PX-XXXX
-                    </p>
-
                     <h3 class="text-h3 font-weight-bold mt-8 mb-2">Courriel</h3>
                     <p class="text-body-1 mb-4">
                         <a href="mailto:drc_direction@uqac.ca"

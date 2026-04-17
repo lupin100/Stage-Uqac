@@ -46,8 +46,8 @@ onMounted(fetchPersonDetail)
 
       <v-row class="mb-10">
         <v-col cols="12" md="4">
-          <v-img :src="person.photoPath || defaultAvatar" aspect-ratio="3/4" cover border
-            class="bg-grey-lighten-3 rounded"></v-img>
+          <v-img :src="person.photoPath || defaultAvatar" :width="200" :aspect-ratio="3 / 4" cover
+            class="bg-grey-lighten-3 elevation-1"></v-img>
         </v-col>
 
         <v-col cols="12" md="8">

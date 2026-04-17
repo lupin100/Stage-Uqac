@@ -58,6 +58,32 @@ class PersonController extends AbstractController
     }
 
     /**
+     * GET : Filtrer les membres par rôle de manière générique
+     */
+    #[Route('/filter/{role}', name: 'app_person_filter_by_role', methods: ['GET'])]
+    public function getByRole(string $role, PersonRepository $repository): JsonResponse
+    {
+        // On tente de convertir la chaîne de l'URL en cas de l'Enum
+        // Ex: "Membre associé" deviendra PersonEnum::MEMBRE_ASSOCIE
+        $enumRole = \App\Enum\PersonEnum::tryFrom($role);
+
+        if (!$enumRole) {
+            return $this->json([
+                'error' => 'Rôle non valide',
+                'received' => $role,
+                'available_roles' => array_column(\App\Enum\PersonEnum::cases(), 'value')
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $members = $repository->findBy(
+            ['role' => $enumRole],
+            ['lastName' => 'ASC']
+        );
+
+        return $this->json($members, Response::HTTP_OK, [], ['groups' => 'person:read']);
+    }
+
+    /**
      * POST : Créer une nouvelle personne
      */
     #[Route('', name: 'app_person_create', methods: ['POST'])]
