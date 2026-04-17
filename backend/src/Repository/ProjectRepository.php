@@ -18,7 +18,11 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function findProjectsByFilters(?string $status, ?string $search, ?string $thematic, ?int $limit = null, ?int $offset = null): array
     {
-        $qb = $this->createQueryBuilder('p');
+        $qb = $this->createQueryBuilder('p')
+        ->leftJoin('p.contributors', 'c')
+        ->addSelect('c')
+        ->leftJoin('c.person', 'pers')
+        ->addSelect('pers');
 
         if ($status === 'finished') {
             $qb->andWhere('p.isFinished = true');
