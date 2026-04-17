@@ -16,6 +16,50 @@ class PersonRepository extends ServiceEntityRepository
         parent::__construct($registry, Person::class);
     }
 
+    public function findDetailedPersonById(int $id): ?array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.studentProfile', 'sp')
+            ->leftJoin('sp.studentDegree', 'sd')
+            ->leftJoin('sp.supervisor', 's')
+            ->leftJoin('sp.coSupervisor', 'cs')
+            ->leftJoin('p.institutions', 'i')
+            ->leftJoin('p.departements', 'd')
+            ->andWhere('p.id = :id')
+            ->setParameter('id', $id)
+            ->select([
+                'p.id AS id',
+                'p.firstName AS firstName',
+                'p.lastName AS lastName',
+                'p.email AS email',
+                'p.photoPath AS photoPath',
+                'p.jobTitle AS jobTitle',
+                'p.personalPageUrl AS personalPageUrl',
+                'p.biography AS biography',
+                'p.role AS role',
+
+                'sp.id AS studentProfileId',
+                'sp.topic AS topic',
+
+                'sd.degree AS degree',
+                'sd.startYear AS start_year',
+                'sd.endYear AS end_year',
+
+                's.id AS supervisor_id',
+                's.firstName AS supervisor_first_name',
+                's.lastName AS supervisor_last_name',
+
+                'cs.id AS co_supervisor_id',
+                'cs.firstName AS co_supervisor_first_name',
+                'cs.lastName AS co_supervisor_last_name',
+
+                'i.name AS institution_name',
+                'd.name AS departement_name',
+            ])
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Person[] Returns an array of Person objects
     //     */
