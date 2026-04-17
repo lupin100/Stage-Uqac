@@ -72,7 +72,7 @@ onMounted(fetchSeminaires)
   <v-container class="py-10" max-width="1000">
     <h2 class="text-h2 font-weight-bold mb-10">Séminaires</h2>
 
-    <v-card variant="flat" class="pa-4 mb-8 bg-grey-lighten-4">
+    <v-card variant="flat" class="pa-4 mb-8">
       <v-row>
         <v-col cols="12" md="8">
           <v-text-field
