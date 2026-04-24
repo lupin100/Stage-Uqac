@@ -2,8 +2,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { breadcrumbStore } from '../main.js'
-import defaultAvatar from '../assets/default-avatar.png'
 import TableComponent from '../components/Tableau.vue'
+import { usePhoto } from '../composables/usePhoto'
+
+const { getPhotoUrl } = usePhoto()
 
 const route = useRoute()
 const person = ref(null)
@@ -83,7 +85,7 @@ onMounted(() => {
 
       <v-row class="mb-10">
         <v-col cols="12" md="4">
-          <v-img :src="person.photoPath || defaultAvatar" :width="200" :aspect-ratio="3 / 4" cover
+          <v-img :src="getPhotoUrl(person.photoPath)" :width="200" :aspect-ratio="3 / 4" cover
             class="bg-grey-lighten-3 elevation-1"></v-img>
         </v-col>
 

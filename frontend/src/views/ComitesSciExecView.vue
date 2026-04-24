@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import defaultAvatar from '../assets/default-avatar.png'
+import { usePhoto } from '../composables/usePhoto'
 
 // États des données
 const committeeMembers = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
+
+const { getPhotoUrl } = usePhoto()
 
 const fetchCommittee = async () => {
     isLoading.value = true
@@ -73,7 +75,7 @@ onMounted(fetchCommittee)
                 <v-col v-for="person in committeeMembers" :key="person.id" cols="12" sm="6" class="mb-6">
                     <div class="d-flex align-start">
                         <router-link :to="{ name: 'membre', params: { id: person.id } }">
-                            <v-img :src="person.photoPath || defaultAvatar" :width="150" :aspect-ratio="3 / 4" cover
+                            <v-img :src="getPhotoUrl(person.photoPath)" :width="150" :aspect-ratio="3 / 4" cover
                                 class="mr-6 bg-grey-lighten-2 elevation-1 rounded"></v-img>
                         </router-link>
 
