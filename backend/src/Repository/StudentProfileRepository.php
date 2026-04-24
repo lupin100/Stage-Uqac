@@ -25,10 +25,12 @@ class StudentProfileRepository extends ServiceEntityRepository
             ->leftJoin('sp.coSupervisor', 'cs')
             ->leftJoin('sp.studentDegree', 'sd')
             ->andWhere('p.role = :role')
+            ->andWhere('p.isActive = true')
             ->setParameter('role', $role)
             ->select([
                 'p.id AS id',
                 "CONCAT(p.lastName, ', ', p.firstName) AS nom",
+                'p.isActive AS isActive',
                 'i.name AS universite',
                 'sd.degree AS statut',
                 "CONCAT(s.lastName, ', ', s.firstName) AS directeur",

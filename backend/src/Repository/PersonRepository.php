@@ -18,11 +18,15 @@ class PersonRepository extends ServiceEntityRepository
 
     public function findStudentsBySupervisor(int $supervisorId): array
     {
-        return $this->createQueryBuilder('p')
-            ->join('p.studentProfile', 'sp')
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb->join('p.studentProfile', 'sp')
             ->leftJoin('sp.studentDegree', 'sd')
-            ->where('sp.supervisor = :id')
-            ->orWhere('sp.coSupervisor = :id')
+            ->where($qb->expr()->orX(
+                'sp.supervisor = :id',
+                'sp.coSupervisor = :id'
+            ))
+            ->andWhere('p.isActive = true')
             ->setParameter('id', $supervisorId)
             ->select([
                 'p.id AS id_person',
@@ -48,6 +52,7 @@ class PersonRepository extends ServiceEntityRepository
             ->leftJoin('p.institutions', 'i')
             ->leftJoin('p.departements', 'd')
             ->andWhere('p.id = :id')
+            ->andWhere('p.isActive = true')
             ->setParameter('id', $id)
             ->select([
                 'p.id AS id',

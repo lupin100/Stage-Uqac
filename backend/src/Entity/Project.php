@@ -15,34 +15,34 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 2500, nullable: true)]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?string $summary = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?string $fundingSource = null;
 
     #[ORM\Column]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?bool $isFinished = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?string $title = null;
 
     #[ORM\Column(enumType: ProjectEnum::class)]
-    #[Groups(['project:read','contributor:read'])]
+    #[Groups(['project:read','contributor:read', 'person:read'])]
     private ?ProjectEnum $thematic = null;
 
     /**
      * @var Collection<int, Contributor>
      */
     #[ORM\ManyToMany(targetEntity: Contributor::class, mappedBy: 'projects')]
-    #[Groups(['project:read'])]
+    #[Groups(['project:read', 'person:read'])]
     private Collection $contributors;
 
  public function __construct()

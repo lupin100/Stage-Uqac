@@ -24,7 +24,13 @@ class StudentProfileController extends AbstractController
     #[Route('', name: 'app_student_profile_index', methods: ['GET'])]
     public function index(StudentProfileRepository $repository): JsonResponse
     {
-        return $this->json($repository->findAll(), Response::HTTP_OK, [], [
+        $profiles = $repository->createQueryBuilder('sp')
+            ->join('sp.person', 'p')
+            ->where('p.isActive = true')
+            ->getQuery()
+            ->getResult();
+
+        return $this->json($profiles, Response::HTTP_OK, [], [
             'groups' => 'student:read'
         ]);
     }
@@ -74,6 +80,10 @@ class StudentProfileController extends AbstractController
     #[Route('/{id}', name: 'app_student_profile_show', methods: ['GET'])]
     public function show(StudentProfile $profile): JsonResponse
     {
+        if (!$profile->getPerson() || !$profile->getPerson()->isActive()) {
+            return $this->json(['error' => 'Profil étudiant introuvable ou inactif'], Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($profile, Response::HTTP_OK, [], [
             'groups' => 'student:read'
         ]);

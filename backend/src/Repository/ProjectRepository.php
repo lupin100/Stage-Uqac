@@ -20,10 +20,10 @@ class ProjectRepository extends ServiceEntityRepository
     public function findProjectsByFilters(?string $status, ?string $search, ?string $thematic, ?int $limit = null, ?int $offset = null): Paginator
     {
         $qb = $this->createQueryBuilder('p')
-        ->leftJoin('p.contributors', 'c')
-        ->addSelect('c')
-        ->leftJoin('c.person', 'pers')
-        ->addSelect('pers');
+            ->leftJoin('p.contributors', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.person', 'pers')
+            ->addSelect('pers');
 
         if ($status === 'finished') {
             $qb->andWhere('p.isFinished = true');
@@ -33,21 +33,23 @@ class ProjectRepository extends ServiceEntityRepository
 
         if ($thematic && $thematic !== 'all') {
             $qb->andWhere('p.thematic = :thematic')
-               ->setParameter('thematic', $thematic);
+                ->setParameter('thematic', $thematic);
         }
 
         if ($search) {
             $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
-               ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
-               ->setParameter('searchQuery', $search)
-               ->setParameter('likeQuery', '%'.$search.'%')
-               ->orderBy('score', 'ASC');
+                ->addSelect('LEVENSHTEIN(p.title, :searchQuery) as HIDDEN score')
+                ->setParameter('searchQuery', $search)
+                ->setParameter('likeQuery', '%' . $search . '%')
+                ->orderBy('score', 'ASC');
         } else {
             $qb->orderBy('p.id', 'DESC');
         }
 
-        if ($limit) $qb->setMaxResults($limit);
-        if ($offset) $qb->setFirstResult($offset);
+        if ($limit)
+            $qb->setMaxResults($limit);
+        if ($offset)
+            $qb->setFirstResult($offset);
 
         return new Paginator($qb->getQuery(), true);
     }
@@ -68,8 +70,8 @@ class ProjectRepository extends ServiceEntityRepository
 
         if ($search) {
             $qb->andWhere('LEVENSHTEIN(p.title, :searchQuery) <= 4 OR p.title LIKE :likeQuery')
-               ->setParameter('searchQuery', $search)
-               ->setParameter('likeQuery', '%'.$search.'%');
+                ->setParameter('searchQuery', $search)
+                ->setParameter('likeQuery', '%' . $search . '%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -81,6 +83,20 @@ class ProjectRepository extends ServiceEntityRepository
             ->select('DISTINCT p.thematic')
             ->where('p.thematic IS NOT NULL')
             ->orderBy('p.thematic', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByPerson(int $personId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.contributors', 'c')
+            ->join('c.person', 'pers')
+            ->leftJoin('p.contributors', 'all_c')
+            ->leftJoin('all_c.person', 'all_p')
+            ->addSelect('all_c', 'all_p')
+            ->where('pers.id = :id')
+            ->setParameter('id', $personId)
             ->getQuery()
             ->getResult();
     }

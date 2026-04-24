@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Repository\PublicationRepository;
+use App\Repository\ProjectRepository;
 
 #[Route('/api/persons')]
 class PersonController extends AbstractController
@@ -23,50 +24,77 @@ class PersonController extends AbstractController
     #[Route('', name: 'app_person_index', methods: ['GET'])]
     public function index(Request $request, PersonRepository $repository): JsonResponse
     {
-        $page = $request->query->get('page');
-        $role = $request->query->get('role'); // On récupère le rôle s'il est fourni
+        $role = $request->query->get('role');
 
         $criteria = [];
         if ($role) {
             $criteria['role'] = $role;
         }
-
-        if ($page === null) {
-            $persons = $repository->findBy($criteria, ['lastName' => 'ASC']);
-            return $this->json($persons, Response::HTTP_OK, [], ['groups' => 'person:read']);
-        }
-
-        $page = max(1, (int) $page);
-        $limit = max(1, (int) $request->query->get('limit', 6));
-        $offset = ($page - 1) * $limit;
-
-        $persons = $repository->findBy(
-            $criteria,
-            ['lastName' => 'ASC'],
-            $limit,
-            $offset
-        );
-
-        $total = $repository->count($criteria);
-
-        return $this->json([
-            'data' => $persons,
-            'page' => $page,
-            'limit' => $limit,
-            'total' => $total,
-            'last_page' => ceil($total / $limit)
-        ], Response::HTTP_OK, [], ['groups' => 'person:read']);
+        $persons = $repository->findBy($criteria, ['lastName' => 'ASC']);
+        return $this->json($persons, Response::HTTP_OK, [], ['groups' => 'person:read']);
     }
 
+    // src/Controller/PersonController.php
+
     #[Route('/details/{id}', name: 'app_person_details', methods: ['GET'])]
-    public function details(int $id, PersonRepository $repository): JsonResponse
-    {
+    public function details(
+        int $id,
+        PersonRepository $repository,
+        PublicationRepository $pubRepo,
+        ProjectRepository $projRepo
+    ): JsonResponse {
         $person = $repository->findDetailedPersonById($id);
 
         if (!$person) {
             return $this->json(['error' => 'Personne introuvable'], Response::HTTP_NOT_FOUND);
         }
 
+        // 1. Récupérer les Publications
+        $publicationsEntities = $pubRepo->findByPerson($id);
+        $publicationsData = [];
+        foreach ($publicationsEntities as $pub) {
+            $contributors = [];
+            foreach ($pub->getContributors() as $contributor) {
+                $p = $contributor->getPerson();
+                $contributors[] = [
+                    'personId' => $p ? $p->getId() : null,
+                    'firstName' => $p ? $p->getFirstName() : null,
+                    'lastName' => $p ? $p->getLastName() : null,
+                ];
+            }
+            $publicationsData[] = [
+                'id' => $pub->getId(),
+                'title' => $pub->getTitle(),
+                'year' => $pub->getYear(),
+                'type' => $pub->getPublicationType(),
+                'contributors' => $contributors
+            ];
+        }
+
+        // 2. Récupérer les Projets
+        $projectsEntities = $projRepo->findByPerson($id);
+        $projectsData = [];
+        foreach ($projectsEntities as $proj) {
+            $contributors = [];
+            foreach ($proj->getContributors() as $contributor) {
+                $p = $contributor->getPerson();
+                $contributors[] = [
+                    'personId' => $p ? $p->getId() : null,
+                    'firstName' => $p ? $p->getFirstName() : null,
+                    'lastName' => $p ? $p->getLastName() : null,
+                ];
+            }
+            $projectsData[] = [
+                'id' => $proj->getId(),
+                'title' => $proj->getTitle(),
+                'summary' => $proj->getSummary(),
+                'isFinished' => $proj->isFinished(),
+                'thematic' => $proj->getThematic(),
+                'contributors' => $contributors
+            ];
+        }
+
+        // 3. Assemblage final
         $data = [
             'id' => $person['id'],
             'firstName' => $person['firstName'],
@@ -77,15 +105,8 @@ class PersonController extends AbstractController
             'personalPageUrl' => $person['personalPageUrl'],
             'biography' => $person['biography'],
             'role' => $person['role'],
-
-            'institution' => [
-                'name' => $person['institution_name'] ?: null,
-            ],
-
-            'departement' => [
-                'name' => $person['departement_name'] ?: null,
-            ],
-
+            'institution' => ['name' => $person['institution_name'] ?: null],
+            'departement' => ['name' => $person['departement_name'] ?: null],
             'studentProfile' => [
                 'id' => $person['studentProfileId'],
                 'topic' => $person['topic'],
@@ -105,6 +126,8 @@ class PersonController extends AbstractController
                     'lastName' => $person['co_supervisor_last_name'],
                 ],
             ],
+            'publications' => $publicationsData,
+            'projects' => $projectsData
         ];
 
         return $this->json($data, Response::HTTP_OK);
@@ -156,7 +179,7 @@ class PersonController extends AbstractController
         }
 
         $members = $repository->findBy(
-            ['role' => $enumRole],
+            ['role' => $enumRole, 'isActive' => true],
             ['lastName' => 'ASC']
         );
 
@@ -196,9 +219,14 @@ class PersonController extends AbstractController
     /**
      * GET ONE : Détails d'une personne
      */
-    #[Route('/{id}', name: 'app_person_show', methods: ['GET'])]
     public function show(Person $person): JsonResponse
     {
+        if (!$person->isActive()) {
+            return $this->json([
+                'error' => 'Personne introuvable ou inactive'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
         return $this->json($person, Response::HTTP_OK, [], [
             'groups' => 'person:read'
         ]);
