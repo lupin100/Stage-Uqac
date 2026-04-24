@@ -9,8 +9,11 @@ const route = useRoute()
 const person = ref(null)
 const isLoading = ref(true)
 const errorMessage = ref(null)
-
 const studentsList = ref([])
+
+// Propriétés calculées pour extraire les données de l'objet "person"
+const publications = computed(() => person.value?.publications || [])
+const projects = computed(() => person.value?.projects || [])
 
 const studentHeaders = [
   { title: 'Étudiant(e)s', key: 'fullName' },
@@ -35,8 +38,9 @@ const isStudentProfile = computed(() => {
   return role === 'Etudiant' || role === 'Ancien étudiant'
 })
 
-const fetchPersonDetail = async () => {
+const fetchPersonData = async () => {
   try {
+    isLoading.value = true
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/details/${route.params.id}`)
     if (!response.ok) throw new Error('Membre introuvable')
 
@@ -59,27 +63,9 @@ const fetchPersonDetail = async () => {
   }
 }
 
-const publications = ref([])
-
-const pubHeaders = [
-  { title: 'Titre', key: 'title' },
-  { title: 'Type', key: 'type' },
-  { title: 'Année', key: 'year' },
-  { title: 'Lien', key: 'url', sortable: false },
-]
-
-const fetchMemberPublications = async () => {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/persons/${route.params.id}/publications`)
-  if (res.ok) {
-    publications.value = await res.json()
-  }
-}
-
 onMounted(() => {
-  fetchMemberPublications(),
-    fetchPersonDetail()
+  fetchPersonData()
 })
-
 </script>
 
 <template>
@@ -198,15 +184,71 @@ onMounted(() => {
             {{ person.biography || "Aucune biographie disponible pour le moment." }}
           </div>
         </div>
-        <v-expansion-panels class="mt-6" variant="separated" multiple>
-          <v-expansion-panel v-if="publications.length > 0" class="mt-4">
+        <v-expansion-panels class="mt-6" multiple>
+          <v-expansion-panel v-if="projects?.length > 0">
+            <v-expansion-panel-title class="text-h6 font-weight-bold">
+              Projets de recherche
+            </v-expansion-panel-title>
+
+            <v-expansion-panel-text>
+              <v-row>
+                <v-col v-for="project in projects" :key="project.id" cols="12">
+                  <v-card variant="outlined" class="mb-2 border-sm hover-shadow transition-swing">
+                    <v-row no-gutters align="center">
+
+                      <v-col cols="12" md="2" class="pa-4 text-center border-md-right">
+                        <v-chip class="font-weight-bold text-white"
+                          :color="project.isFinished ? 'green-darken-1' : 'orange-darken-1'" size="small">
+                          {{ project.isFinished ? 'Terminé' : 'En cours' }}
+                        </v-chip>
+                      </v-col>
+
+                      <v-col cols="12" md="10" class="pa-4">
+                        <div class="mb-2">
+                          <v-chip variant="tonal" color="primary" size="small" class="px-2 font-weight-bold">
+                            {{ project.thematic }}
+                          </v-chip>
+                        </div>
+
+                        <v-card-title class="text-h6 font-weight-bold px-0 pt-0 text-wrap leading-tight">
+                          {{ project.title }}
+                        </v-card-title>
+
+                        <v-card-subtitle class="px-0 text-body-1 italic text-grey-darken-2">
+                          <template v-if="project.contributors?.length > 0">
+                            <span v-for="(contributor, index) in project.contributors" :key="index">
+                              <router-link v-if="contributor.personId"
+                                :to="{ name: 'membre', params: { id: contributor.personId } }"
+                                class="text-black text-decoration-none author-link font-weight-medium">
+                                {{ contributor.firstName }} {{ contributor.lastName }}
+                              </router-link>
+                              <span v-else class="text-black">{{ contributor.firstName }} {{ contributor.lastName
+                              }}</span>
+                              <span v-if="index < project.contributors.length - 1" class="mr-1">, </span>
+                            </span>
+                          </template>
+                        </v-card-subtitle>
+
+                        <v-card-text v-if="project.summary" class="px-0 py-0 text-body-2 text-truncate"
+                          style="max-height: 3em; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; white-space: normal;">
+                          {{ project.summary }}
+                        </v-card-text>
+                      </v-col>
+
+                    </v-row>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel v-if="publications?.length > 0">
             <v-expansion-panel-title class="text-h6 font-weight-bold">
               Publications
             </v-expansion-panel-title>
 
             <v-expansion-panel-text>
               <v-row>
-
                 <v-col v-for="pub in publications" :key="pub.id" cols="12">
                   <v-card variant="outlined" class="mb-2 border-sm hover-shadow transition-swing">
                     <v-row no-gutters align="center">
@@ -217,10 +259,10 @@ onMounted(() => {
                         </div>
                       </v-col>
 
-                      <v-col cols="12" md="7" class="pa-4">
+                      <v-col cols="12" md="10" class="pa-4">
                         <div class="mb-2">
-                          <v-chip variant="tonal" color="primary" size="small" class="px-2 font-weight-bold">
-                            {{ pub.publicationType }}
+                          <v-chip variant="tonal" color="secondary" size="small" class="px-2 font-weight-bold">
+                            {{ pub.type }}
                           </v-chip>
                         </div>
 
@@ -230,28 +272,18 @@ onMounted(() => {
 
                         <v-card-subtitle class="px-0 text-body-1 italic text-grey-darken-2">
                           <template v-if="pub.contributors?.length > 0">
-                            <span v-for="(contributor, index) in pub.contributors" :key="contributor.id">
-                              <router-link v-if="contributor.person"
-                                :to="{ name: 'membre', params: { id: contributor.person.id } }"
+                            <span v-for="(contributor, index) in pub.contributors" :key="index">
+                              <router-link v-if="contributor.personId"
+                                :to="{ name: 'membre', params: { id: contributor.personId } }"
                                 class="text-black text-decoration-none author-link font-weight-medium">
-                                {{ contributor.person.firstName }} {{ contributor.person.lastName }}
+                                {{ contributor.firstName }} {{ contributor.lastName }}
                               </router-link>
-                              <span v-else class="text-black">{{ contributor.displayName }}</span>
+                              <span v-else class="text-black">{{ contributor.firstName }} {{ contributor.lastName
+                              }}</span>
                               <span v-if="index < pub.contributors.length - 1" class="mr-1">, </span>
                             </span>
                           </template>
                         </v-card-subtitle>
-                      </v-col>
-
-                      <v-col cols="12" md="3" class="pa-4 text-md-right text-center">
-                        <v-btn v-if="pub.externalUrl" :href="pub.externalUrl" target="_blank" variant="flat"
-                          color="primary" size="small" prepend-icon="mdi-open-in-new" rounded="pill">
-                          Consulter
-                        </v-btn>
-                        <v-chip v-else size="small" variant="text" color="grey">
-                          <v-icon start size="16">mdi-link-off</v-icon>
-                          Lien non disponible
-                        </v-chip>
                       </v-col>
 
                     </v-row>
@@ -282,7 +314,7 @@ onMounted(() => {
             </v-expansion-panel-text>
           </v-expansion-panel>
 
-          <v-expansion-panel v-if="formerStudents.length > 0" class="mt-4">
+          <v-expansion-panel v-if="formerStudents?.length > 0">
             <v-expansion-panel-title class="text-h6 font-weight-bold">
               Ancien(ne)s étudiant(e)s
             </v-expansion-panel-title>

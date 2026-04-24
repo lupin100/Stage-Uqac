@@ -8,14 +8,14 @@ const errorMessage = ref(null)
 
 // --- ÉTATS DES FILTRES ---
 const searchQuery = ref('')
-const selectedStatus = ref('all') 
+const selectedStatus = ref('all')
 const selectedThematic = ref('Tous')
 const thematicOptions = ref(['Tous']) // Initialisé avec 'Tous' par défaut
 
 const statusOptions = [
-  { label: 'Tous les états', value: 'all' },
-  { label: 'Terminés', value: 'finished' },
-  { label: 'En cours', value: 'ongoing' }
+    { label: 'Tous les états', value: 'all' },
+    { label: 'Terminés', value: 'finished' },
+    { label: 'En cours', value: 'ongoing' }
 ]
 
 // --- RÉCUPÉRATION DES THÉMATIQUES DISTINCTES ---
@@ -24,7 +24,7 @@ const fetchThematics = async () => {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/thematics`)
         if (!response.ok) throw new Error()
         const data = await response.json()
-        
+
         // On fusionne 'Tous' avec les thématiques reçues de l'API
         thematicOptions.value = ['Tous', ...data]
     } catch (error) {
@@ -128,7 +128,10 @@ const resetFilters = () => {
                                 </v-chip>
 
                                 <v-card-title class="text-h5 font-weight-bold px-0 pt-0 text-wrap leading-tight">
-                                    {{ project.title }}
+                                    <router-link :to="{ name: 'projet', params: { id: project.id } }"
+                                        class="text-black text-decoration-none hover-title">
+                                        {{ project.title }}
+                                    </router-link>
                                 </v-card-title>
 
                                 <v-card-subtitle class="px-0 text-body-1 text-grey-darken-2 italic">
@@ -155,8 +158,7 @@ const resetFilters = () => {
 
                         <v-card-actions class="px-0 mt-4">
                             <v-chip class="px-3 font-weight-bold text-white" rounded="pill"
-                                :color="project.isFinished ? 'green-darken-1' : 'orange-darken-1'"
-                                size="small">
+                                :color="project.isFinished ? 'green-darken-1' : 'orange-darken-1'" size="small">
                                 {{ project.isFinished ? 'Terminé' : 'En cours' }}
                             </v-chip>
                         </v-card-actions>
