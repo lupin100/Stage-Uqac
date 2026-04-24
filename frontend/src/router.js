@@ -23,6 +23,7 @@ import ComitesSciExecView from './views/ComitesSciExecView.vue'
 import MembresAssociesView from './views/MembresAssociesView.vue'
 import MembresEmeritesView from './views/MembresEmeritesView.vue'
 import MembresCollabosView from './views/MembresCollabosView.vue'
+import ProjetView from './views/ProjetView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -86,6 +87,10 @@ const router = createRouter({
     {
       path: '/projets', name: 'projets', component: ProjectsView, meta: {
         breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Projets', to: '/projets' } ] }
+    },
+    {
+      path: '/projets/:id', name: 'projet', component: ProjetView, meta: {
+        breadcrumb: [ { title: 'Accueil', to: '/' }, { title: 'Projets', to: '/projets' }, { title: '/:id' } ] }
     },
     {
       path: '/membres-reguliers', name: 'membres-reguliers', component: MembresReguliersView, meta: {
