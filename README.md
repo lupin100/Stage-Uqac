@@ -1,4 +1,4 @@
-# Site Web du Groupe de Recherches Informatique (G.R.I) — UQAC
+# Site Web du Groupe de Recherches Informatique (G.R.I)
 
 Ce dépôt rassemble l'intégralité du code source de l'application web officielle développée pour le **Groupe de Recherches Informatique (G.R.I)** de l'Université du Québec à Chicoutimi conçu dans le cadre du cours **8INF309 Stage-projet I** durant le semestre d'Hiver 2026.
 
